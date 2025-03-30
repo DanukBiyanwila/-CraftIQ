@@ -5,16 +5,19 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="beb7fd76-8999-445b-9e64-87bad26407a3" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/CraftIQ/CraftIQ/configs/ApplicationConfig.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/CraftIQ/CraftIQ/controller/UserController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/CraftIQ/CraftIQ/dto/UserDto.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/CraftIQ/CraftIQ/entity/User.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/CraftIQ/CraftIQ/exception/NotFoundException.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/CraftIQ/CraftIQ/repository/UserRepository.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/CraftIQ/CraftIQ/service/Impl/UserServiceImpl.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/CraftIQ/CraftIQ/service/UserService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/backend/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/resources/application.properties" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/CraftIQ/CraftIQ/controller/LearningPlansController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/CraftIQ/CraftIQ/controller/SkillPostsController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/CraftIQ/CraftIQ/dto/LearningPlansDto.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/CraftIQ/CraftIQ/dto/SkillPostsDto.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/CraftIQ/CraftIQ/entity/LearningPlans.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/CraftIQ/CraftIQ/entity/SkillPosts.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/CraftIQ/CraftIQ/repository/LearningPlansRepository.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/CraftIQ/CraftIQ/repository/SkillPostsRepository.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/CraftIQ/CraftIQ/service/Impl/LearningPlansServiceImpl.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/CraftIQ/CraftIQ/service/Impl/SkillPostsServiceImpl.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/CraftIQ/CraftIQ/service/LearningPlansService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/CraftIQ/CraftIQ/service/SkillPostsService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -24,8 +27,8 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="Interface" />
         <option value="Exception" />
+        <option value="Interface" />
         <option value="Class" />
       </list>
     </option>
@@ -99,7 +102,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1743328170194</updated>
-      <workItem from="1743328171334" duration="4660000" />
+      <workItem from="1743328171334" duration="15283000" />
     </task>
     <servers />
   </component>
