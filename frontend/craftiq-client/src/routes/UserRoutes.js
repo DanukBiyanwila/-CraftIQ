@@ -5,6 +5,7 @@ import BlogDetails from '../views/BlogDetails';
 import Categori from '../views/Categori';
 import Elements from '../views/Elements';
 import Home from '../views/Home';
+import SikillPostView from '../views/SikillPostView';
 import SkillPost from '../views/SkillPost';
 import SkillPostEdit from '../views/SkillPostEdit';
 import UserEdit from '../views/UserEdit';
@@ -92,7 +93,7 @@ const UserRoutes = [
   {
     path: "/viewSkillPost",
     name: "editSkillPost",
-    component: Skill, 
+    component: SikillPostView, 
     layout: "/user",
     hidden: false,
   }

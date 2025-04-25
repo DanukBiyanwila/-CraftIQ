@@ -19,9 +19,6 @@ function SikillPostView() {
                     {CommentData.slice(0, 4).map(comment => (
                       <CommentView key={comment.id} comment={comment} />
                     ))}
-                    
-                    
-                   
                   </div>
                   <CommentCreate/>
                 </div>
