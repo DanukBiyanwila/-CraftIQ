@@ -91,8 +91,8 @@ const UserRoutes = [
     hidden: false,
   },
   {
-    path: "/viewSkillPost",
-    name: "editSkillPost",
+    path: "/viewSkillPostUser",
+    name: "viewSkillPost",
     component: SikillPostView, 
     layout: "/user",
     hidden: false,
