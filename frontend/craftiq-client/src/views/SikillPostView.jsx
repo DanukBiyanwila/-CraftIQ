@@ -2,7 +2,8 @@ import React from 'react'
 import CommentView from '../components/CommentView'
 import CommentCreate from '../components/CommentCreate'
 import SlideBar from '../components/SlideBar'
-
+import CommentData from '../data/commentData'
+import SingleBlog from '../components/blog/SingleBlog'
 function SikillPostView() {
     return (
         <div>
@@ -11,7 +12,7 @@ function SikillPostView() {
             <div className="container">
               <div className="row">
                 <div className="col-lg-8 posts-list">
-                  <SinglePost/>
+                  <SingleBlog/>
                   
                 
                   <div className="comments-area">
@@ -20,7 +21,7 @@ function SikillPostView() {
                       <CommentView key={comment.id} comment={comment} />
                     ))}
                     
-                    
+                     
                    
                   </div>
                   <CommentCreate/>
