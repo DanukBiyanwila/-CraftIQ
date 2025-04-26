@@ -88,6 +88,13 @@ const UserRoutes = [
     component: SkillPostEdit, 
     layout: "/user",
     hidden: false,
+  },
+  {
+    path: "/viewSkillPost",
+    name: "editSkillPost",
+    component: Skill, 
+    layout: "/user",
+    hidden: false,
   }
 ];
 
