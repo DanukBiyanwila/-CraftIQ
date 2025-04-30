@@ -4,6 +4,7 @@ import Blog from '../views/Blog';
 import BlogDetails from '../views/BlogDetails';
 import Categori from '../views/Categori';
 import Elements from '../views/Elements';
+import FeeadbackManagment from '../views/FeeadbackManagment';
 import Home from '../views/Home';
 import LearningPlane from '../views/LearningPlane';
 import LearningPlaneCreate from '../views/LearningPlaneCreate';
@@ -102,6 +103,13 @@ const UserRoutes = [
     path: "/learning-plane",
     name: "Plane Skill",
     component: LearningPlane, 
+    layout: "/user",
+    hidden: false,
+  },
+  {
+    path: "/feedback-managment",
+    name: "feedback managment",
+    component: FeeadbackManagment, 
     layout: "/user",
     hidden: false,
   },
