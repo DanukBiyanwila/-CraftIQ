@@ -5,6 +5,7 @@ import BlogDetails from '../views/BlogDetails';
 import Categori from '../views/Categori';
 import Elements from '../views/Elements';
 import FeeadbackManagment from '../views/FeeadbackManagment';
+import FindUser from '../views/FindUser';
 import Home from '../views/Home';
 import LearningPlane from '../views/LearningPlane';
 import LearningPlaneCreate from '../views/LearningPlaneCreate';
@@ -113,6 +114,14 @@ const UserRoutes = [
     layout: "/user",
     hidden: false,
   },
+  {
+    path: "/find-user",
+    name: "Find User ",
+    component: FindUser, 
+    layout: "/user",
+    hidden: false,
+  }
+
 
 ];
 

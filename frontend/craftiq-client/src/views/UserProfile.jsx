@@ -173,7 +173,8 @@ function UserProfile() {
                 ))}
 
                 <div className="col-sm-12">
-                  <a className="btn btn-info " target="__blank" href="https://www.bootdey.com/snippets/view/profile-edit-data-and-skills">Find Users</a>
+               
+                  <Link to="/user/find-user"className="btn btn-info " >Find User</Link>
                 </div>
               </div>
             </div>

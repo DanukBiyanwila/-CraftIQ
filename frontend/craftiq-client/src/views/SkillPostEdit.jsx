@@ -2,7 +2,6 @@ import React from 'react'
 
 import { Link, useParams } from 'react-router-dom'
 import SkillPostData from '../data/SkillPostData'
-import PostSIdeSingle from '../components/skillPost/PostSIdeSingle'
 import UpdatePost from '../components/skillPost/UpdatePost'
 
 function SkillPostEdit() {
