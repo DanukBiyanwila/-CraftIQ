@@ -14,12 +14,12 @@ function AllPost({ skillpost }) {
                                 style={{ width: '770px', height: '370px' }}
                             />
 
-{skillpost.date && skillpost.date.length > 0 && (
-  <a href="#" className="blog_item_date">
-    <h3>{skillpost.date[0].day}</h3>
-    <p>{skillpost.date[0].month}</p>
-  </a>
-)}
+                            {skillpost.date && skillpost.date.length > 0 && (
+                                <a href="#" className="blog_item_date">
+                                    <h3>{skillpost.date[0].day}</h3>
+                                    <p>{skillpost.date[0].month}</p>
+                                </a>
+                            )}
 
 
                         </div>
