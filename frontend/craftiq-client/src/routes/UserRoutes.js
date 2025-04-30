@@ -5,7 +5,8 @@ import BlogDetails from '../views/BlogDetails';
 import Categori from '../views/Categori';
 import Elements from '../views/Elements';
 import Home from '../views/Home';
-import SikillPostView from '../views/SikillPostView';
+import LearningPlane from '../views/LearningPlane';
+import LearningPlaneCreate from '../views/LearningPlaneCreate';
 import SkillPost from '../views/SkillPost';
 import SkillPostEdit from '../views/SkillPostEdit';
 import UserEdit from '../views/UserEdit';
@@ -91,12 +92,20 @@ const UserRoutes = [
     hidden: false,
   },
   {
-    path: "/viewSkillPostUser",
-    name: "viewSkillPost",
-    component: SikillPostView, 
+    path: "/plane-create",
+    name: "Plane Skill",
+    component: LearningPlaneCreate, 
     layout: "/user",
     hidden: false,
-  }
+  },
+  {
+    path: "/learning-plane",
+    name: "Plane Skill",
+    component: LearningPlane, 
+    layout: "/user",
+    hidden: false,
+  },
+
 ];
 
 export default UserRoutes;
