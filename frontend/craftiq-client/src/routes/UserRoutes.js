@@ -11,6 +11,7 @@ import LearningPlane from '../views/LearningPlane';
 import LearningPlaneCreate from '../views/LearningPlaneCreate';
 import SkillPost from '../views/SkillPost';
 import SkillPostEdit from '../views/SkillPostEdit';
+import SkillPostView from '../views/SkillPostView';
 import UserEdit from '../views/UserEdit';
 import UserProfile from '../views/UserProfile';
 import ViewSkillPost from '../views/ViewSkillPost';
@@ -118,6 +119,13 @@ const UserRoutes = [
     path: "/find-user",
     name: "Find User ",
     component: FindUser, 
+    layout: "/user",
+    hidden: false,
+  },
+  {
+    path: "/skill-post-view",
+    name: "View Post  ",
+    component: SkillPostView, 
     layout: "/user",
     hidden: false,
   }

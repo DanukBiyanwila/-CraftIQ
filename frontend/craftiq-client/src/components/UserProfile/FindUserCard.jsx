@@ -1,4 +1,5 @@
-import React from 'react'
+import React from 'react';
+
 
 function FindUserCard({ user }) {
   return (
@@ -7,18 +8,23 @@ function FindUserCard({ user }) {
         <div className="row">
           <div className="col-md-12 d-flex flex-column align-items-center text-center">
             <div className="single-defination">
-              <img
-                src={user.img}
-                alt={user.title}
-                style={{ width: '300px', height: '300px', objectFit: 'cover', borderRadius: '50%' }}
-              />
+              <div className="image-wrapper">
+                <img
+                  src={user.img}
+                  alt={user.title}
+                  className="user-image"
+                />
+                <div className="overlay">
+                  <button className="follow-btn">Follow</button>
+                </div>
+              </div>
               <h3 className="mt-3">{user.title}</h3>
             </div>
           </div>
         </div>
       </div>
     </div>
-  )
+  );
 }
 
-export default FindUserCard
+export default FindUserCard;
