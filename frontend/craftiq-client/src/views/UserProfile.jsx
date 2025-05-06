@@ -1,9 +1,6 @@
 import React from 'react'
-import BlogData from '../data/BlogData';
-import SingleBloghorizontal from '../components/blog/SingleBloghorizontal';
 import UserData from '../data/UserData';
 import SingleBlog from '../components/blog/SingleBlog';
-import SingleBlogMedium from '../components/blog/SingleBlogMedium';
 import { Link } from 'react-router-dom';
 import UserCard from '../components/UserProfile/UserCard';
 function UserProfile() {
@@ -50,6 +47,12 @@ function UserProfile() {
 
               <div className="card mt-3">
                 <Link to="/user/skillPost" className="btn btn-primary">Skill Post Managment</Link>
+              </div>
+              <div className="card mt-3">
+                <Link to="/user/feedback-managment" className="btn btn-primary">Feedback Managment</Link>
+              </div>
+              <div className="card mt-3">
+                <Link to="/user/learning-plane" className="btn btn-primary">Learning Plane Managment</Link>
               </div>
               
             </div>
@@ -165,21 +168,15 @@ function UserProfile() {
                     </div>
                   </div>
                 </div>
-
-
                 {UserData.slice(0, 6).map(blog => (
                   <SingleBlog key={blog.id} blog={blog} />
                 ))}
 
                 <div className="col-sm-12">
-                  <a className="btn btn-info " target="__blank" href="https://www.bootdey.com/snippets/view/profile-edit-data-and-skills">Find Users</a>
+               
+                  <Link to="/user/find-user"className="btn btn-info " >Find User</Link>
                 </div>
               </div>
-
-
-
-
-
             </div>
           </div>
         </div>
