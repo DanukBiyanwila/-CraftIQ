@@ -14,11 +14,11 @@ import SingleBlog1 from "../components/blog/SingleBlog1";
 import SocialFans from "../components/SocialFans";
 import SingleBlogRecent from "../components/blog/SingleBlogRecent";
 import SingleBloghorizontal from "../components/blog/SingleBloghorizontal";
-import SingleBlogVertical from "../components/blog/SingleBlogVertical";
+
 import PopularBlog from "../components/blog/popularBlog";
 import TrendingBlog from "../components/blog/TrendingBlog/TrendingBlog";
 import HomeVideoSection from "../components/blog/video/HomeVideoSection";
-import SingleBlogMedium from "../components/blog/SingleBlogMedium";
+
 function Home() {
   const sliderRef = useRef(null);
 
