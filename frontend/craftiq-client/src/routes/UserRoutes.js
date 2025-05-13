@@ -11,6 +11,7 @@ import Follower from '../views/Follower';
 import Home from '../views/Home';
 import LearningPlane from '../views/LearningPlane';
 import LearningPlaneCreate from '../views/LearningPlaneCreate';
+import ProgressView from '../views/ProgressView';
 import SkillPost from '../views/SkillPost';
 import SkillPostDetails from '../views/SkillPostDetails';
 import SkillPostEdit from '../views/SkillPostEdit';
@@ -143,6 +144,13 @@ const UserRoutes = [
     path: "/follower",
     name: "Followers  ",
     component: Follower, 
+    layout: "/user",
+    hidden: false,
+  },
+   {
+    path: "/progress-view",
+    name: "progress view  ",
+    component: ProgressView, 
     layout: "/user",
     hidden: false,
   },
