@@ -8,12 +8,13 @@ import img6 from '../assets/clients/img/blog/single_blog_1.png';
 import img7 from '../assets/clients/img/blog/single_blog_2.png';
 import img8 from '../assets/clients/img/blog/single_blog_3.png';
 import img9 from '../assets/clients/img/blog/single_blog_4.png';
+import team2 from "../assets/clients/img/gallery/team2.png"
 
 const UserData = [
   {
     id: 1,
-    img: img1,
-    title: "Ramith Kalhara",
+    img: team2,
+    name: "Ramith Kalhara",
     pargrhap: "Struggling to sell one multi-million dollar home currently on the market won’t stop actress and singer Jennifer Lopez.",
     day: "19",
     month: "Jun",
@@ -23,7 +24,7 @@ const UserData = [
   {
     id: 2,
     img: img2,
-    title: "Sandun Ravihara",
+    name: "Sandun Ravihara",
     pargrhap: "AI is shaping industries at an unprecedented pace. Here's what you should know.",
     day: "05",
     month: "Aug",
@@ -33,7 +34,7 @@ const UserData = [
   {
     id: 3,
     img: img3,
-    title: "Ramith Kalhara",
+    name: "Ramith Kalhara",
     pargrhap: "Electric vehicles are no longer a luxury—here's how they’re changing the world.",
     day: "11",
     month: "Sep",
@@ -43,7 +44,7 @@ const UserData = [
   {
     id: 4,
     img: img4,
-    title: "Ramith Kalhara",
+    name: "Ramith Kalhara",
     pargrhap: "Remote work is booming. These are the top places to explore and stay productive.",
     day: "22",
     month: "Oct",
@@ -53,7 +54,7 @@ const UserData = [
   {
     id: 5,
     img: img5,
-    title: "Ramith Kalhara",
+    name: "Ramith Kalhara",
     pargrhap: "Simplicity is the key to focus. Discover how minimalism transforms productivity.",
     day: "14",
     month: "Nov",
@@ -63,7 +64,7 @@ const UserData = [
   {
     id: 6,
     img: img6,
-    title: "Ramith Kalhara",
+    name: "Ramith Kalhara",
     pargrhap: "Companies are investing in mental wellness. Here’s why it matters.",
     day: "03",
     month: "Dec",
@@ -73,7 +74,7 @@ const UserData = [
   {
     id: 7,
     img: img7,
-    title: "Ramith Kalhara",
+    name: "Ramith Kalhara",
     pargrhap: "From quantum computing to smarter AI, the future is closer than you think.",
     day: "01",
     month: "Jan",
@@ -83,7 +84,7 @@ const UserData = [
   {
     id: 8,
     img: img8,
-    title: "Ramith Kalhara",
+    name: "Ramith Kalhara",
     pargrhap: "From quantum computing to smarter AI, the future is closer than you think.",
     day: "01",
     month: "Jan",
@@ -93,7 +94,7 @@ const UserData = [
   {
     id: 9,
     img: img9,
-    title: "Ramith Kalhara",
+    name: "Ramith Kalhara",
     pargrhap: "From quantum computing to smarter AI, the future is closer than you think.",
     day: "01",
     month: "Jan",

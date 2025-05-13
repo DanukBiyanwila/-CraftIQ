@@ -3,6 +3,7 @@ import UserData from '../data/UserData';
 import SingleBlog from '../components/blog/SingleBlog';
 import { Link } from 'react-router-dom';
 import UserCard from '../components/UserProfile/UserCard';
+import SingleUser from '../components/UserProfile/SingleUser';
 function UserProfile() {
   return (
     <div className="profile">
@@ -19,7 +20,11 @@ function UserProfile() {
           {/* /Breadcrumb */}
           <div className="row gutters-sm">
             <div className="col-md-4 mb-3">
+
+              {/* User card  */}
               <UserCard/>
+
+              
               <div className="card mt-3">
                 <ul className="list-group list-group-flush">
                   <li className="list-group-item d-flex justify-content-between align-items-center flex-wrap">
@@ -168,8 +173,8 @@ function UserProfile() {
                     </div>
                   </div>
                 </div>
-                {UserData.slice(0, 6).map(blog => (
-                  <SingleBlog key={blog.id} blog={blog} />
+                {UserData.slice(0, 6).map(user => (
+                  <SingleUser key={user.id} user={user} />
                 ))}
 
                 <div className="col-sm-12">

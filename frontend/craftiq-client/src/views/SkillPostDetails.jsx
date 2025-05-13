@@ -1,20 +1,20 @@
 import React from 'react'
-import SingleBlog from '../components/blog/SingleBlog'
-import SinglePost from '../components/SinglePost'
-import CommentData from '../data/commentData'
 import CommentView from '../components/CommentView'
+import CommentData from '../data/commentData'
 import CommentCreate from '../components/CommentCreate'
 import SlideBar from '../components/SlideBar'
+import SkillPostSingle from '../components/skillPost/SkillPostSingle'
+import { useParams } from 'react-router-dom';
 
-function BlogDetails() {
+function SkillPostDetails() {
+  const { id } = useParams();
   return (
     <div>
-        {/*================Blog Area =================*/}
-      <section className="blog_area single-post-area section-padding">
+          <section className="blog_area single-post-area section-padding">
         <div className="container">
           <div className="row">
             <div className="col-lg-8 posts-list">
-              <SinglePost/>
+              <SkillPostSingle/>
               
             
               <div className="comments-area">
@@ -34,9 +34,8 @@ function BlogDetails() {
           </div>
         </div>
       </section>
-      {/*================ Blog Area end =================*/}
     </div>
   )
 }
 
-export default BlogDetails
+export default SkillPostDetails

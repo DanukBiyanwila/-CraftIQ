@@ -2,16 +2,17 @@
 import AddLearningPlan from '../components/learningPlane/AddLearningPlan';
 import About from '../views/About';
 import Blog from '../views/Blog';
-import BlogDetails from '../views/BlogDetails';
 import Categori from '../views/Categori';
 import EditLearningPlane from '../views/EditLearningPlane';
 import Elements from '../views/Elements';
 import FeeadbackManagment from '../views/FeeadbackManagment';
 import FindUser from '../views/FindUser';
+import Follower from '../views/Follower';
 import Home from '../views/Home';
 import LearningPlane from '../views/LearningPlane';
 import LearningPlaneCreate from '../views/LearningPlaneCreate';
 import SkillPost from '../views/SkillPost';
+import SkillPostDetails from '../views/SkillPostDetails';
 import SkillPostEdit from '../views/SkillPostEdit';
 import SkillPostView from '../views/SkillPostView';
 import UserEdit from '../views/UserEdit';
@@ -37,13 +38,6 @@ const UserRoutes = [
     path: "/categori",
     name: "Categori",
     component: Categori, 
-    layout: "/user",
-    hidden: false,
-  },
-  {
-    path: "/blog-details",
-    name: "BlogDetails",
-    component: BlogDetails, 
     layout: "/user",
     hidden: false,
   },
@@ -133,11 +127,25 @@ const UserRoutes = [
   },
   {
     path: "/edit-learning-plane/:id",
-    name: "View Post  ",
+    name: "Edit learning plane   ",
     component: EditLearningPlane, 
     layout: "/user",
     hidden: false,
-  }
+  },
+  {
+    path: "/skill-post-details",
+    name: "Skill Post details  ",
+    component: SkillPostDetails, 
+    layout: "/user",
+    hidden: false,
+  },
+    {
+    path: "/follower",
+    name: "Followers  ",
+    component: Follower, 
+    layout: "/user",
+    hidden: false,
+  },
 
 
 ];

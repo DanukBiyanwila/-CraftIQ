@@ -11,14 +11,14 @@ function FindUserCard({ user }) {
               <div className="image-wrapper">
                 <img
                   src={user.img}
-                  alt={user.title}
+                  alt={user.name}
                   className="user-image"
                 />
                 <div className="overlay">
                   <button className="follow-btn">Follow</button>
                 </div>
               </div>
-              <h3 className="mt-3">{user.title}</h3>
+              <h3 className="mt-3">{user.name}</h3>
             </div>
           </div>
         </div>
