@@ -1,8 +1,10 @@
 // src/routes/UserRoutes.js
+import AddLearningPlan from '../components/learningPlane/AddLearningPlan';
 import About from '../views/About';
 import Blog from '../views/Blog';
 import BlogDetails from '../views/BlogDetails';
 import Categori from '../views/Categori';
+import EditLearningPlane from '../views/EditLearningPlane';
 import Elements from '../views/Elements';
 import FeeadbackManagment from '../views/FeeadbackManagment';
 import FindUser from '../views/FindUser';
@@ -126,6 +128,13 @@ const UserRoutes = [
     path: "/skill-post-view",
     name: "View Post  ",
     component: SkillPostView, 
+    layout: "/user",
+    hidden: false,
+  },
+  {
+    path: "/edit-learning-plane/:id",
+    name: "View Post  ",
+    component: EditLearningPlane, 
     layout: "/user",
     hidden: false,
   }
