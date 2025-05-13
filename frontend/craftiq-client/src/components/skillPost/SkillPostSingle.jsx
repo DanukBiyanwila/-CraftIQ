@@ -4,50 +4,36 @@ import singleblog1 from "../../assets/clients/img/blog/single_blog_1.png"
 import author from "../../assets/clients/img/blog/author.png"
 import next from "../../assets/clients/img/post/next.png"
 import preview from "../../assets/clients/img/post/preview.png"
-function SkillPostSingle() {
+function SkillPostSingle( {skillPost} ) {
   return (
       <div>
             <div className="single-post">
                     <div className="feature-img">
-                      <img className="img-fluid" src={singleblog1} alt="" />
+                      <img className="img-fluid" src={skillPost.img} alt="" />
                     </div>
                     <div className="blog_details">
-                      <h2>Second divided from form fish beast made every of seas
-                        all gathered us saying he our
+                      <h2> {skillPost.title}
                       </h2>
                       <ul className="blog-info-link mt-3 mb-4">
                         <li><a href="#"><i className="fa fa-user" /> Travel, Lifestyle</a></li>
                         <li><a href="#"><i className="fa fa-comments" /> 03 Comments</a></li>
                       </ul>
                       <p className="excert">
-                        MCSE boot camps have its supporters and its detractors. Some people do not understand why you
-                        should have to spend money on boot camp when you can get the MCSE study materials yourself at a
-                        fraction of the camp price. However, who has the willpower
+                        {skillPost.pargrhap_1}
                       </p>
                       <p>
-                        MCSE boot camps have its supporters and its detractors. Some people do not understand why you
-                        should have to spend money on boot camp when you can get the MCSE study materials yourself at a
-                        fraction of the camp price. However, who has the willpower to actually sit through a
-                        self-imposed MCSE training. who has the willpower to actually
+                        {skillPost.pargrhap_2}
                       </p>
                       <div className="quote-wrapper">
                         <div className="quotes">
-                          MCSE boot camps have its supporters and its detractors. Some people do not understand why you
-                          should have to spend money on boot camp when you can get the MCSE study materials yourself at
-                          a fraction of the camp price. However, who has the willpower to actually sit through a
-                          self-imposed MCSE training.
+                          {skillPost.pargrhap_3}
                         </div>
                       </div>
                       <p>
-                        MCSE boot camps have its supporters and its detractors. Some people do not understand why you
-                        should have to spend money on boot camp when you can get the MCSE study materials yourself at a
-                        fraction of the camp price. However, who has the willpower
+                        {skillPost.pargrhap_4}
                       </p>
                       <p>
-                        MCSE boot camps have its supporters and its detractors. Some people do not understand why you
-                        should have to spend money on boot camp when you can get the MCSE study materials yourself at a
-                        fraction of the camp price. However, who has the willpower to actually sit through a
-                        self-imposed MCSE training. who has the willpower to actually
+                        {skillPost.pargrhap_5}
                       </p>
                     </div>
                   </div>

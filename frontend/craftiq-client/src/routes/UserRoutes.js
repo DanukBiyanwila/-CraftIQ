@@ -133,7 +133,7 @@ const UserRoutes = [
     hidden: false,
   },
   {
-    path: "/skill-post-details",
+    path: "/skill-post-details/:id",
     name: "Skill Post details  ",
     component: SkillPostDetails, 
     layout: "/user",

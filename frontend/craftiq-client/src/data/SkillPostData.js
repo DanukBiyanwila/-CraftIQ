@@ -1,5 +1,5 @@
 // SkillPostData.js
-import img1 from '../assets/clients/img/gallery/whats_right_img1.png';
+import img1 from "../assets/clients/img/blog/single_blog_1.png"
 
 const SkillPostData = [
   {

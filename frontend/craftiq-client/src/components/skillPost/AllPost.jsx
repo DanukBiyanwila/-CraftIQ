@@ -1,7 +1,7 @@
 import React from 'react'
-   import { Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 function AllPost({ skillpost }) {
- 
+
 
     return (
         <div>
@@ -27,8 +27,8 @@ function AllPost({ skillpost }) {
                         </div>
                         <div className="blog_details">
                             <Link className="d-inline-block" to={`/user/skill-post-details/${skillpost.id}`}>
-  <h2>{skillpost.title}</h2>
-</Link>
+                                <h2>{skillpost.title}</h2>
+                            </Link>
 
                             <p> {skillpost.summary} </p>
                             <ul className="blog-info-link">
