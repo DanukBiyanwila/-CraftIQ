@@ -13,8 +13,7 @@ function UserCard() {
                       <p className="text-muted font-size-sm">Bay Area, San Francisco, CA</p>
                       <p className="text-muted font-size-sm">Folowers :  320</p>
                       <p className="text-muted font-size-sm">Folowing :  220</p>
-                      <button className="btn btn-primary">Follow</button>
-                      <button className="btn btn-outline-primary">Message</button>
+                  
                     </div>
                   </div>
                 </div>

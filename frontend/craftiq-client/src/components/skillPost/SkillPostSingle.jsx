@@ -51,46 +51,7 @@ function SkillPostSingle( {skillPost} ) {
                         <li><a href="#"><i className="fab fa-behance" /></a></li>
                       </ul>
                     </div>
-                    <div className="navigation-area">
-                      <div className="row">
-                        <div className="col-lg-6 col-md-6 col-12 nav-left flex-row d-flex justify-content-start align-items-center">
-                          <div className="thumb">
-                            <a href="#">
-                              <img className="img-fluid" src={preview} alt="" />
-                            </a>
-                          </div>
-                          <div className="arrow">
-                            <a href="#">
-                              <span className="lnr text-white ti-arrow-left" />
-                            </a>
-                          </div>
-                          <div className="detials">
-                            <p>Prev Post</p>
-                            <a href="#">
-                              <h4>Space The Final Frontier</h4>
-                            </a>
-                          </div>
-                        </div>
-                        <div className="col-lg-6 col-md-6 col-12 nav-right flex-row d-flex justify-content-end align-items-center">
-                          <div className="detials">
-                            <p>Next Post</p>
-                            <a href="#">
-                              <h4>Telescopes 101</h4>
-                            </a>
-                          </div>
-                          <div className="arrow">
-                            <a href="#">
-                              <span className="lnr text-white ti-arrow-right" />
-                            </a>
-                          </div>
-                          <div className="thumb">
-                            <a href="#">
-                              <img className="img-fluid" src={next} alt="" />
-                            </a>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
+               
                   </div>
                   <div className="blog-author">
                     <div className="media align-items-center">
