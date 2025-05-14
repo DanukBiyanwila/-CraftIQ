@@ -3,14 +3,17 @@ package com.CraftIQ.CraftIQ.service.Impl;
 import com.CraftIQ.CraftIQ.dto.FeedbackDto;
 import com.CraftIQ.CraftIQ.entity.Feedback;
 import com.CraftIQ.CraftIQ.entity.SkillPosts;
+import com.CraftIQ.CraftIQ.entity.User;
 import com.CraftIQ.CraftIQ.exception.NotFoundException;
 import com.CraftIQ.CraftIQ.repository.FeedbackRepository;
 import com.CraftIQ.CraftIQ.repository.SkillPostsRepository;
+import com.CraftIQ.CraftIQ.repository.UserRepository;
 import com.CraftIQ.CraftIQ.service.FeedbackService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -21,14 +24,29 @@ public class FeedbackServiceImpl implements FeedbackService {
     private final FeedbackRepository feedbackRepository;
     private final ModelMapper mapper;
     private final SkillPostsRepository skillPostsRepository;
+    private final UserRepository userRepository;
 
     // Create Feedback
     @Override
     public FeedbackDto createFeedback(FeedbackDto feedbackDto) {
-        Feedback feedback = feedbackDto.toEntity(mapper); // Use your custom mapping method
+        // 1. Basic field mapping
+        Feedback feedback = mapper.map(feedbackDto, Feedback.class);
+
+        // 2. Manual relationship resolution
+        User user = userRepository.findById(feedbackDto.getUserId())
+                .orElseThrow(() -> new RuntimeException("User not found with ID: " + feedbackDto.getUserId()));
+        SkillPosts post = skillPostsRepository.findById(feedbackDto.getSkillPostId())
+                .orElseThrow(() -> new RuntimeException("SkillPost not found with ID: " + feedbackDto.getSkillPostId()));
+
+        feedback.setUser(user);
+        feedback.setSkillPost(post);
+        feedback.setCreatedAt(LocalDateTime.now());
+
+        // 3. Save and return
         Feedback savedFeedback = feedbackRepository.save(feedback);
-        return savedFeedback.toDto(mapper); // Use your custom toDto if needed
+        return savedFeedback.toDto(mapper);
     }
+
 
 
     // Get all Feedback

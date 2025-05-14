@@ -1,5 +1,6 @@
 package com.CraftIQ.CraftIQ.entity;
 
+import com.CraftIQ.CraftIQ.dto.FeedbackDto;
 import com.CraftIQ.CraftIQ.dto.UserDto;
 import com.CraftIQ.CraftIQ.dto.UserSummaryDto;
 import jakarta.persistence.*;
@@ -57,6 +58,9 @@ public class User {
     @ManyToMany(mappedBy = "followers")
     private Set<User> following = new HashSet<>();
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Feedback> feedbacks = new HashSet<>();
+
 
 
     public UserDto toDto(ModelMapper mapper) {
@@ -74,6 +78,14 @@ public class User {
                     .map(f -> mapper.map(f, UserSummaryDto.class))
                     .collect(Collectors.toSet());
             userDto.setFollowing(followingDtos);
+        }
+
+        // Adding feedbacks to the DTO if needed
+        if (this.getFeedbacks() != null) {
+            Set<FeedbackDto> feedbackDtos = this.getFeedbacks().stream()
+                    .map(feedback -> mapper.map(feedback, FeedbackDto.class))
+                    .collect(Collectors.toSet());
+            userDto.setFeedbacks(feedbackDtos);
         }
         return userDto;
 

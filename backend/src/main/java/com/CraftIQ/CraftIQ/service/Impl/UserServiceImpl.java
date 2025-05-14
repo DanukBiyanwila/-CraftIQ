@@ -1,6 +1,7 @@
 package com.CraftIQ.CraftIQ.service.Impl;
 
 import com.CraftIQ.CraftIQ.dto.UserDto;
+import com.CraftIQ.CraftIQ.entity.Feedback;
 import com.CraftIQ.CraftIQ.entity.User;
 import com.CraftIQ.CraftIQ.exception.NotFoundException;
 import com.CraftIQ.CraftIQ.repository.UserRepository;
@@ -25,10 +26,10 @@ public class UserServiceImpl implements UserService {
     // Create User
     @Override
     public UserDto createUser(UserDto userDto) {
-        // Convert DTO to Entity
+        // 1. Convert DTO to Entity
         User user = mapper.map(userDto, User.class);
 
-        // Attach existing users as followers
+        // 2. Handle followers
         if (userDto.getFollowers() != null && !userDto.getFollowers().isEmpty()) {
             Set<User> followers = userDto.getFollowers().stream()
                     .map(summary -> userRepository.findById(summary.getId())
@@ -37,8 +38,7 @@ public class UserServiceImpl implements UserService {
             user.setFollowers(followers);
         }
 
-
-        // Attach existing users as following
+        // 3. Handle following
         if (userDto.getFollowing() != null && !userDto.getFollowing().isEmpty()) {
             Set<User> following = userDto.getFollowing().stream()
                     .map(summary -> userRepository.findById(summary.getId())
@@ -47,12 +47,26 @@ public class UserServiceImpl implements UserService {
             user.setFollowing(following);
         }
 
-        // Save Entity
+        // 4. Handle feedbacks (establish back-reference)
+        if (userDto.getFeedbacks() != null && !userDto.getFeedbacks().isEmpty()) {
+            Set<Feedback> feedbackEntities = userDto.getFeedbacks().stream()
+                    .map(dto -> {
+                        Feedback feedback = mapper.map(dto, Feedback.class);
+                        feedback.setUser(user); // Establish the relationship
+                        return feedback;
+                    })
+                    .collect(Collectors.toSet());
+
+            user.setFeedbacks(feedbackEntities);
+        }
+
+        // 5. Save Entity
         User savedUser = userRepository.save(user);
 
-        // Use custom toDto() to ensure correct follower/following mapping
+        // 6. Return DTO
         return savedUser.toDto(mapper);
     }
+
 
 
     // Get all Users
