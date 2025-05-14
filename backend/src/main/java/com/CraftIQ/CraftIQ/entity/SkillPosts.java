@@ -70,7 +70,7 @@ public class SkillPosts {
                     .map(like -> {
                         LikeDto dto = new LikeDto();
                         dto.setId(like.getId());
-//                        dto.setUserId(like.getUser().getId());
+                        dto.setUserId(like.getUser().getId());
                         dto.setSkillPostId(like.getSkillPost().getId());
                         return dto;
                     }).collect(Collectors.toList());

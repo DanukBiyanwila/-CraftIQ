@@ -9,6 +9,7 @@ import com.CraftIQ.CraftIQ.repository.FeedbackRepository;
 import com.CraftIQ.CraftIQ.repository.SkillPostsRepository;
 import com.CraftIQ.CraftIQ.repository.UserRepository;
 import com.CraftIQ.CraftIQ.service.FeedbackService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -68,20 +69,38 @@ public class FeedbackServiceImpl implements FeedbackService {
 
     // Update Feedback
     @Override
+    @Transactional
     public FeedbackDto updateFeedback(Long id, FeedbackDto feedbackDto) {
+        // Fetch existing feedback
         Feedback existingFeedback = feedbackRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Feedback not found with ID: " + id));
 
+        // Update fields from DTO
+        if (feedbackDto.getComment() != null) {
+            existingFeedback.setComment(feedbackDto.getComment());
+        }
 
+
+
+        // Optionally update user
+        if (feedbackDto.getUserId() != null) {
+            User user = userRepository.findById(feedbackDto.getUserId())
+                    .orElseThrow(() -> new NotFoundException("User not found with ID: " + feedbackDto.getUserId()));
+            existingFeedback.setUser(user);
+        }
+
+        // Optionally update skill post
         if (feedbackDto.getSkillPostId() != null) {
             SkillPosts skillPost = skillPostsRepository.findById(feedbackDto.getSkillPostId())
                     .orElseThrow(() -> new NotFoundException("SkillPost not found with ID: " + feedbackDto.getSkillPostId()));
             existingFeedback.setSkillPost(skillPost);
         }
 
-        Feedback updatedFeedback = feedbackRepository.save(existingFeedback);
-        return mapper.map(updatedFeedback, FeedbackDto.class);
+        // Save and return
+        Feedback savedFeedback = feedbackRepository.save(existingFeedback);
+        return savedFeedback.toDto(mapper);
     }
+
 
     // Delete Feedback
     @Override

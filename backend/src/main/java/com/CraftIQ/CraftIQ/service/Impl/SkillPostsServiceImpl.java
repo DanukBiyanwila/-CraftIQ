@@ -92,42 +92,39 @@ public class SkillPostsServiceImpl implements SkillPostsService {
     @Override
     @Transactional
     public SkillPostsDto updateSkillPost(Long id, SkillPostsDto skillPostsDto) {
-        // Check if SkillPost exists
         SkillPosts existingSkillPost = skillPostsRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("SkillPost not found with ID: " + id));
 
-        // Map DTO to entity for updating (but DO NOT map the ID field)
         existingSkillPost.setTitle(skillPostsDto.getTitle());
         existingSkillPost.setDescription(skillPostsDto.getDescription());
-        existingSkillPost.setCreatedAt(skillPostsDto.getCreatedAt());
+        if (skillPostsDto.getCreatedAt() != null) {
+            existingSkillPost.setCreatedAt(skillPostsDto.getCreatedAt());
+        }
         existingSkillPost.setCategory(skillPostsDto.getCategory());
         existingSkillPost.setTags(skillPostsDto.getTags());
         existingSkillPost.setImageUrl(skillPostsDto.getImageUrl());
 
-        // Map and attach feedbacks (if any)
+        // Optional: update user if applicable
+        if (skillPostsDto.getUser() != null) {
+            User user = mapper.map(skillPostsDto.getUser(), User.class);
+            existingSkillPost.setUser(user);
+        }
+
+        // Update feedbacks only if provided
         if (skillPostsDto.getFeedbacks() != null && !skillPostsDto.getFeedbacks().isEmpty()) {
             List<Feedback> updatedFeedbacks = skillPostsDto.getFeedbacks().stream()
                     .map(dto -> {
                         Feedback feedback = dto.toEntity(mapper);
-                        feedback.setSkillPost(existingSkillPost); // Ensure feedback is linked to the existing SkillPost
+                        feedback.setSkillPost(existingSkillPost);
                         return feedback;
                     })
                     .collect(Collectors.toList());
-
-            // Update feedbacks list (only if feedbacks are provided in the DTO)
             existingSkillPost.setFeedbacks(updatedFeedbacks);
-        } else {
-            // If no feedbacks are provided, keep the existing feedbacks
-            existingSkillPost.setFeedbacks(existingSkillPost.getFeedbacks());
         }
 
-        // Save updated SkillPost entity
         SkillPosts savedSkillPost = skillPostsRepository.save(existingSkillPost);
-
-        // Convert and return updated SkillPost DTO
         return savedSkillPost.toDto(mapper);
     }
-
 
 
 

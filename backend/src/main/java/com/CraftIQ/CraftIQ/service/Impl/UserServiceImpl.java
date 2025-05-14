@@ -147,6 +147,31 @@ public class UserServiceImpl implements UserService {
             user.setFollowing(existingUser.getFollowing());
         }
 
+        // Update feedbacks
+        if (userDto.getFeedbacks() != null) {
+            existingUser.getFeedbacks().clear();
+            Set<Feedback> updatedFeedbacks = userDto.getFeedbacks().stream()
+                    .map(dto -> {
+                        Feedback feedback = mapper.map(dto, Feedback.class);
+                        feedback.setUser(existingUser); // maintain relationship
+                        return feedback;
+                    }).collect(Collectors.toSet());
+            existingUser.getFeedbacks().addAll(updatedFeedbacks);
+        }
+
+        // Update skillPosts
+        if (userDto.getSkillPosts() != null) {
+            existingUser.getSkillPosts().clear();
+            Set<SkillPosts> updatedPosts = userDto.getSkillPosts().stream()
+                    .map(dto -> {
+                        SkillPosts post = dto.toEntity(mapper);
+                        post.setUser(existingUser);
+                        return post;
+                    }).collect(Collectors.toSet());
+            existingUser.getSkillPosts().addAll(updatedPosts);
+        }
+
+
         // Save the updated user entity
         User savedUser = userRepository.save(user);
 

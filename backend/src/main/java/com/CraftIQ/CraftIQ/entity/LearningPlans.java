@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.modelmapper.ModelMapper;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -48,8 +49,9 @@ public class LearningPlans {
     private User user;
 
     // Milestones in this learning plan
-    @OneToMany(mappedBy = "learningPlan", cascade = CascadeType.ALL)
-    private List<Milestone> milestones;
+    @OneToMany(mappedBy = "learningPlan", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Milestone> milestones = new ArrayList<>();
+
 
 
     public LearningPlansDto toDto(ModelMapper mapper) {

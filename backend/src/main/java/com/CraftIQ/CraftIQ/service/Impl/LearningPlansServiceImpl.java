@@ -1,7 +1,9 @@
 package com.CraftIQ.CraftIQ.service.Impl;
 
 import com.CraftIQ.CraftIQ.dto.LearningPlansDto;
+import com.CraftIQ.CraftIQ.dto.MilestoneDto;
 import com.CraftIQ.CraftIQ.entity.LearningPlans;
+import com.CraftIQ.CraftIQ.entity.Milestone;
 import com.CraftIQ.CraftIQ.entity.User;
 import com.CraftIQ.CraftIQ.exception.NotFoundException;
 import com.CraftIQ.CraftIQ.repository.LearningPlansRepository;
@@ -11,10 +13,12 @@ import com.CraftIQ.CraftIQ.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -68,12 +72,43 @@ public class LearningPlansServiceImpl implements LearningPlansService {
 
     // Update Learning Plan by ID
     @Override
+    @Transactional
     public LearningPlansDto updateLearningPlan(Long id, LearningPlansDto learningPlansDto) {
-        LearningPlans learningPlan = learningPlansDto.toEntity(mapper);
-        learningPlan.setId(id);
-        LearningPlans savedLearningPlan = learningPlansRepository.save(learningPlan);
-        return savedLearningPlan.toDto(mapper);
+        LearningPlans existingPlan = learningPlansRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Learning Plan not found with ID: " + id));
+
+        // Update basic fields
+        existingPlan.setTitle(learningPlansDto.getTitle());
+        existingPlan.setDescription(learningPlansDto.getDescription());
+        existingPlan.setStartDate(learningPlansDto.getStartDate());
+        existingPlan.setEndDate(learningPlansDto.getEndDate());
+        existingPlan.setAuthor(learningPlansDto.getAuthor());
+        existingPlan.setStatus(learningPlansDto.getStatus());
+
+        // Update user if needed
+        if (learningPlansDto.getUserId() != null) {
+            User user = userRepository.findById(learningPlansDto.getUserId())
+                    .orElseThrow(() -> new RuntimeException("User not found with ID: " + learningPlansDto.getUserId()));
+            existingPlan.setUser(user);
+        }
+
+        // Update milestones
+        if (learningPlansDto.getMilestones() != null) {
+            // Clear existing milestones
+            existingPlan.getMilestones().clear();
+
+            // Add new milestones
+            for (MilestoneDto dto : learningPlansDto.getMilestones()) {
+                Milestone milestone = dto.toEntity(mapper);
+                milestone.setLearningPlan(existingPlan);
+                existingPlan.getMilestones().add(milestone);
+            }
+        }
+
+        LearningPlans saved = learningPlansRepository.save(existingPlan);
+        return saved.toDto(mapper);
     }
+
 
     // Delete Learning Plan by ID
     @Override
