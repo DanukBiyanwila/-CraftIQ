@@ -25,6 +25,8 @@ public class SkillPostsDto {
 
     private UserSummaryDto user;
 
+    private List<LikeDto> likes;
+
     public SkillPosts toEntity(ModelMapper mapper) {
         SkillPosts post = mapper.map(this, SkillPosts.class);
 

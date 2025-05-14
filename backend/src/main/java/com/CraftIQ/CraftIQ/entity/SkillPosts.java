@@ -1,9 +1,6 @@
 package com.CraftIQ.CraftIQ.entity;
 
-import com.CraftIQ.CraftIQ.dto.FeedbackDto;
-import com.CraftIQ.CraftIQ.dto.SkillPostsDto;
-import com.CraftIQ.CraftIQ.dto.UserDto;
-import com.CraftIQ.CraftIQ.dto.UserSummaryDto;
+import com.CraftIQ.CraftIQ.dto.*;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -54,6 +51,10 @@ public class SkillPosts {
     @JoinColumn(name = "user_id", nullable = false)  // Defines the column name for the foreign key
     private User user;
 
+    @OneToMany(mappedBy = "skillPost", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Like> likes = new ArrayList<>();
+
+
     public SkillPostsDto toDto(ModelMapper mapper) {
         SkillPostsDto skillPostsDto = mapper.map(this, SkillPostsDto.class);
         // Map feedbacks to FeedbackDto list (avoid cyclic references)
@@ -63,6 +64,18 @@ public class SkillPosts {
                     .collect(Collectors.toList());
             skillPostsDto.setFeedbacks(feedbackDtos);
         }
-        return mapper.map(this, SkillPostsDto.class);
+
+        if (this.getLikes() != null) {
+            List<LikeDto> likeDtos = this.getLikes().stream()
+                    .map(like -> {
+                        LikeDto dto = new LikeDto();
+                        dto.setId(like.getId());
+//                        dto.setUserId(like.getUser().getId());
+                        dto.setSkillPostId(like.getSkillPost().getId());
+                        return dto;
+                    }).collect(Collectors.toList());
+            skillPostsDto.setLikes(likeDtos);
+        }
+        return skillPostsDto;
     }
 }
