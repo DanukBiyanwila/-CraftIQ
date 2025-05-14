@@ -1,6 +1,7 @@
 package com.CraftIQ.CraftIQ.service.Impl;
 
 import com.CraftIQ.CraftIQ.dto.UserDto;
+import com.CraftIQ.CraftIQ.entity.Feedback;
 import com.CraftIQ.CraftIQ.entity.User;
 import com.CraftIQ.CraftIQ.exception.NotFoundException;
 import com.CraftIQ.CraftIQ.repository.UserRepository;
@@ -12,6 +13,8 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -23,15 +26,48 @@ public class UserServiceImpl implements UserService {
     // Create User
     @Override
     public UserDto createUser(UserDto userDto) {
-        // Convert DTO to Entity
+        // 1. Convert DTO to Entity
         User user = mapper.map(userDto, User.class);
 
-        // Save Entity
+        // 2. Handle followers
+        if (userDto.getFollowers() != null && !userDto.getFollowers().isEmpty()) {
+            Set<User> followers = userDto.getFollowers().stream()
+                    .map(summary -> userRepository.findById(summary.getId())
+                            .orElseThrow(() -> new RuntimeException("Follower not found with ID: " + summary.getId())))
+                    .collect(Collectors.toSet());
+            user.setFollowers(followers);
+        }
+
+        // 3. Handle following
+        if (userDto.getFollowing() != null && !userDto.getFollowing().isEmpty()) {
+            Set<User> following = userDto.getFollowing().stream()
+                    .map(summary -> userRepository.findById(summary.getId())
+                            .orElseThrow(() -> new RuntimeException("Following user not found with ID: " + summary.getId())))
+                    .collect(Collectors.toSet());
+            user.setFollowing(following);
+        }
+
+        // 4. Handle feedbacks (establish back-reference)
+        if (userDto.getFeedbacks() != null && !userDto.getFeedbacks().isEmpty()) {
+            Set<Feedback> feedbackEntities = userDto.getFeedbacks().stream()
+                    .map(dto -> {
+                        Feedback feedback = mapper.map(dto, Feedback.class);
+                        feedback.setUser(user); // Establish the relationship
+                        return feedback;
+                    })
+                    .collect(Collectors.toSet());
+
+            user.setFeedbacks(feedbackEntities);
+        }
+
+        // 5. Save Entity
         User savedUser = userRepository.save(user);
 
-        // Convert back to DTO and return
-        return mapper.map(savedUser, UserDto.class);
+        // 6. Return DTO
+        return savedUser.toDto(mapper);
     }
+
+
 
     // Get all Users
     @Override
@@ -61,10 +97,44 @@ public class UserServiceImpl implements UserService {
         if (!userRepository.existsById(id)) {
             throw new NotFoundException("User not found with ID: " + id);
         }
+
+        // Retrieve the existing user from the database
+        User existingUser = userRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("User not found with ID: " + id));
+
+        // Map the other fields from DTO to Entity
         User user = mapper.map(userDto, User.class);
         user.setId(id);
+
+        // Handle followers update
+        if (userDto.getFollowers() != null && !userDto.getFollowers().isEmpty()) {
+            Set<User> followers = userDto.getFollowers().stream()
+                    .map(summary -> userRepository.findById(summary.getId())
+                            .orElseThrow(() -> new RuntimeException("Follower not found with ID: " + summary.getId())))
+                    .collect(Collectors.toSet());
+            user.setFollowers(followers);
+        } else {
+            // If no followers are provided, retain the existing ones
+            user.setFollowers(existingUser.getFollowers());
+        }
+
+        // Handle following update
+        if (userDto.getFollowing() != null && !userDto.getFollowing().isEmpty()) {
+            Set<User> following = userDto.getFollowing().stream()
+                    .map(summary -> userRepository.findById(summary.getId())
+                            .orElseThrow(() -> new RuntimeException("Following user not found with ID: " + summary.getId())))
+                    .collect(Collectors.toSet());
+            user.setFollowing(following);
+        } else {
+            // If no following users are provided, retain the existing ones
+            user.setFollowing(existingUser.getFollowing());
+        }
+
+        // Save the updated user entity
         User savedUser = userRepository.save(user);
-        return mapper.map(savedUser, UserDto.class);
+
+        // Use custom toDto() to ensure correct follower/following mapping
+        return savedUser.toDto(mapper);
     }
 
     // Delete User by ID

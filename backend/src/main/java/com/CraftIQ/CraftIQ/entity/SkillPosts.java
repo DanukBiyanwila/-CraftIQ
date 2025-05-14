@@ -1,6 +1,9 @@
 package com.CraftIQ.CraftIQ.entity;
 
+import com.CraftIQ.CraftIQ.dto.FeedbackDto;
 import com.CraftIQ.CraftIQ.dto.SkillPostsDto;
+import com.CraftIQ.CraftIQ.dto.UserDto;
+import com.CraftIQ.CraftIQ.dto.UserSummaryDto;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,6 +12,10 @@ import lombok.Setter;
 import org.modelmapper.ModelMapper;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Setter
 @Getter
@@ -31,12 +38,6 @@ public class SkillPosts {
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
-
-    @Column(name = "author", nullable = false)
-    private String author;
-
     @Column(name = "category", nullable = false)
     private String category;
 
@@ -46,7 +47,18 @@ public class SkillPosts {
     @Column(name = "image_url")
     private String imageUrl;
 
+    @OneToMany(mappedBy = "skillPost", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Feedback> feedbacks = new ArrayList<>();
+
     public SkillPostsDto toDto(ModelMapper mapper) {
+        SkillPostsDto skillPostsDto = mapper.map(this, SkillPostsDto.class);
+        // Map feedbacks to FeedbackDto list (avoid cyclic references)
+        if (this.getFeedbacks() != null) {
+            List<FeedbackDto> feedbackDtos = this.getFeedbacks().stream()
+                    .map(feedback -> mapper.map(feedback, FeedbackDto.class))
+                    .collect(Collectors.toList());
+            skillPostsDto.setFeedbacks(feedbackDtos);
+        }
         return mapper.map(this, SkillPostsDto.class);
     }
 }

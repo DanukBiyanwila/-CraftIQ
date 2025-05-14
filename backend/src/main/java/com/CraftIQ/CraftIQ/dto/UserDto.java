@@ -1,8 +1,13 @@
 package com.CraftIQ.CraftIQ.dto;
 
+import com.CraftIQ.CraftIQ.entity.Feedback;
 import com.CraftIQ.CraftIQ.entity.User;
 import lombok.Data;
 import org.modelmapper.ModelMapper;
+
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Data
 public class UserDto {
@@ -14,9 +19,27 @@ public class UserDto {
     private String profilePicture;
     private String interests;
 
+    private Set<UserSummaryDto> followers = new HashSet<>();
+    private Set<UserSummaryDto> following = new HashSet<>();
+
+    private Set<FeedbackDto> feedbacks = new HashSet<>();
+
 
     public User toEntity(ModelMapper mapper) {
-        return mapper.map(this, User.class);
+        User user = mapper.map(this, User.class);
+
+        // Map feedbacks if present
+        if (this.feedbacks != null) {
+            Set<Feedback> feedbackEntities = this.feedbacks.stream().map(dto -> {
+                Feedback feedback = mapper.map(dto, Feedback.class);
+                feedback.setUser(user); // important to establish ownership
+                return feedback;
+            }).collect(Collectors.toSet());
+
+            user.setFeedbacks(feedbackEntities);
+        }
+
+        return user;
     }
 }
 
