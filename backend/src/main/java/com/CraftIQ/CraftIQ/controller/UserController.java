@@ -1,5 +1,7 @@
 package com.CraftIQ.CraftIQ.controller;
 
+import com.CraftIQ.CraftIQ.dto.LoginRequestDto;
+import com.CraftIQ.CraftIQ.dto.LoginResponseDto;
 import com.CraftIQ.CraftIQ.dto.UserDto;
 import com.CraftIQ.CraftIQ.service.Impl.UserServiceImpl;
 import lombok.RequiredArgsConstructor;
@@ -59,5 +61,11 @@ public class UserController {
     @GetMapping("/email/{email}")
     public ResponseEntity<UserDto> getUserByEmail(@PathVariable String email) {
         return ResponseEntity.status(HttpStatus.OK).body(userService.getUserByEmail(email));
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<LoginResponseDto> login(@RequestBody LoginRequestDto loginDto) {
+        LoginResponseDto response = userService.authenticateUser(loginDto);
+        return ResponseEntity.ok(response);
     }
 }

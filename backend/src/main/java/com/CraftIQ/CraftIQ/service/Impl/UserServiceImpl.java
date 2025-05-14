@@ -1,5 +1,7 @@
 package com.CraftIQ.CraftIQ.service.Impl;
 
+import com.CraftIQ.CraftIQ.dto.LoginRequestDto;
+import com.CraftIQ.CraftIQ.dto.LoginResponseDto;
 import com.CraftIQ.CraftIQ.dto.UserDto;
 import com.CraftIQ.CraftIQ.entity.Feedback;
 import com.CraftIQ.CraftIQ.entity.SkillPosts;
@@ -224,4 +226,43 @@ public class UserServiceImpl implements UserService {
             throw new NotFoundException("User not found with email: " + email);
         }
     }
+
+    @Override
+    public LoginResponseDto authenticateUser(LoginRequestDto loginRequestDto) {
+        // Find the user by email
+        User user = userRepository.findByEmail(loginRequestDto.getEmail())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        // Check if the password is correct
+        if (!user.getPassword().equals(loginRequestDto.getPassword())) {
+            throw new RuntimeException("Invalid password");
+        }
+
+        // Check if the role is empty or not
+        String role = user.getRole();
+        if (role == null || role.isEmpty()) {
+            // User has no role assigned, treat as normal user
+            role = "USER";  // Default to "USER" if role is empty
+        }
+
+        if ("ADMIN".equalsIgnoreCase(role)) {
+            // Admin specific logic (if needed)
+            // You can return different responses or tokens for admin users
+        } else if ("USER".equalsIgnoreCase(role)) {
+            // User specific logic (if needed)
+            // You can return different responses or tokens for normal users
+        } else {
+            throw new RuntimeException("Invalid role");
+        }
+
+        // Response DTO setup
+        LoginResponseDto response = new LoginResponseDto();
+        response.setMessage("Login successful");
+        response.setUserId(user.getId());
+        response.setEmail(user.getEmail());
+        response.setRole(role);
+
+        return response;
+    }
+
 }

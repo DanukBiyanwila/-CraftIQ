@@ -43,6 +43,9 @@ public class User {
     @Column(name = "interests")
     private String interests;
 
+    @Column(name = "role")
+    private String role;
+
     // Users this user follows
     @ManyToMany
     @JoinTable(
