@@ -10,6 +10,7 @@ import com.CraftIQ.CraftIQ.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -181,13 +182,26 @@ public class UserServiceImpl implements UserService {
 
     // Delete User by ID
     @Override
-    public boolean deleteUser(Long id) {
-        if (!userRepository.existsById(id)) {
-            throw new NotFoundException("User not found with ID: " + id);
+    @Transactional
+    public void deleteUser(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("User not found with ID: " + userId));
+
+        // Remove the user from other users' followers and following lists
+        for (User follower : user.getFollowers()) {
+            follower.getFollowing().remove(user);
         }
-        userRepository.deleteById(id);
-        return true;
+
+        for (User followed : user.getFollowing()) {
+            followed.getFollowers().remove(user);
+        }
+
+        user.getFollowers().clear();
+        user.getFollowing().clear();
+
+        userRepository.delete(user);
     }
+
 
     // Get User by Username
     @Override

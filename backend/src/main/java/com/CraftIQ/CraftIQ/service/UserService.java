@@ -9,8 +9,9 @@ public interface UserService {
     List<UserDto> getAllUsers();
     UserDto getUserById(Long id);
     UserDto updateUser(Long id, UserDto userDto);
-    boolean deleteUser(Long id);
+    void deleteUser(Long id);
     UserDto getUserByUsername(String username);
     UserDto getUserByEmail(String email);
+
 }
 

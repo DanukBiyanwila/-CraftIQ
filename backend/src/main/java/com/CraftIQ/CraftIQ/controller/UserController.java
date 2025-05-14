@@ -43,9 +43,11 @@ public class UserController {
 
     // Delete User by ID
     @DeleteMapping("/{id}")
-    public ResponseEntity<Boolean> deleteUser(@PathVariable Long id) {
-        return ResponseEntity.status(HttpStatus.OK).body(userService.deleteUser(id));
+    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
+        userService.deleteUser(id);
+        return ResponseEntity.noContent().build(); // or .ok().build() if you prefer
     }
+
 
     // Get User by Username
     @GetMapping("/username/{username}")
