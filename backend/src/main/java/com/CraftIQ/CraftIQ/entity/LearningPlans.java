@@ -1,12 +1,17 @@
 package com.CraftIQ.CraftIQ.entity;
 
 import com.CraftIQ.CraftIQ.dto.LearningPlansDto;
+import com.CraftIQ.CraftIQ.dto.MilestoneDto;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.modelmapper.ModelMapper;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Setter
 @Getter
@@ -37,10 +42,33 @@ public class LearningPlans {
     private String author;
 
     @Column(name = "status", nullable = false)
-    private String status;  // For example: "In Progress", "Completed", "Pending"
+    private String status;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
+    // Milestones in this learning plan
+    @OneToMany(mappedBy = "learningPlan", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Milestone> milestones = new ArrayList<>();
+
+
 
     public LearningPlansDto toDto(ModelMapper mapper) {
-        return mapper.map(this, LearningPlansDto.class);
+        LearningPlansDto dto = mapper.map(this, LearningPlansDto.class);
+        if (this.user != null) {
+            dto.setUserId(this.user.getId());
+        }
+        if (this.milestones != null) {
+            List<MilestoneDto> milestoneDtos = this.milestones.stream()
+                    .map(milestone -> mapper.map(milestone, MilestoneDto.class))
+                    .collect(Collectors.toList());
+            dto.setMilestones(milestoneDtos);
+        }
+
+
+        return dto;
     }
+
 }
 

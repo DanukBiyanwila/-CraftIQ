@@ -1,5 +1,7 @@
 package com.CraftIQ.CraftIQ.controller;
 
+import com.CraftIQ.CraftIQ.dto.LoginRequestDto;
+import com.CraftIQ.CraftIQ.dto.LoginResponseDto;
 import com.CraftIQ.CraftIQ.dto.UserDto;
 import com.CraftIQ.CraftIQ.service.Impl.UserServiceImpl;
 import lombok.RequiredArgsConstructor;
@@ -43,9 +45,11 @@ public class UserController {
 
     // Delete User by ID
     @DeleteMapping("/{id}")
-    public ResponseEntity<Boolean> deleteUser(@PathVariable Long id) {
-        return ResponseEntity.status(HttpStatus.OK).body(userService.deleteUser(id));
+    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
+        userService.deleteUser(id);
+        return ResponseEntity.noContent().build(); // or .ok().build() if you prefer
     }
+
 
     // Get User by Username
     @GetMapping("/username/{username}")
@@ -57,5 +61,11 @@ public class UserController {
     @GetMapping("/email/{email}")
     public ResponseEntity<UserDto> getUserByEmail(@PathVariable String email) {
         return ResponseEntity.status(HttpStatus.OK).body(userService.getUserByEmail(email));
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<LoginResponseDto> login(@RequestBody LoginRequestDto loginDto) {
+        LoginResponseDto response = userService.authenticateUser(loginDto);
+        return ResponseEntity.ok(response);
     }
 }
