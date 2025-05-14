@@ -75,7 +75,7 @@ function About() {
             <div className="col-xl-4 col-lg-4 col-md-6 col-sm-">
               <div className="single-team mb-30">
                 <div className="team-img">
-                  <img src={team2} alt="" />
+                  <img src={team2}   style={{ width: '370px', height: '463px' }}  />
                 </div>
                 <div className="team-caption">
                   <h3><a href="#">Ethan Welch</a></h3>
@@ -86,7 +86,7 @@ function About() {
             <div className="col-xl-4 col-lg-4 col-md-6 col-sm-">
               <div className="single-team mb-30">
                 <div className="team-img">
-                  <img src={team3} alt="" />
+                  <img src={team3}   style={{ width: '370px', height: '463px' }} />
                 </div>
                 <div className="team-caption">
                   <h3><a href="#">Ethan Welch</a></h3>
@@ -97,7 +97,7 @@ function About() {
             <div className="col-xl-4 col-lg-4 col-md-6 col-sm-">
               <div className="single-team mb-30">
                 <div className="team-img">
-                  <img src={team1} alt="" />
+                  <img src={team1}   style={{ width: '370px', height: '463px' }} />
                 </div>
                 <div className="team-caption">
                   <h3><a href="#">Ethan Welch</a></h3>
