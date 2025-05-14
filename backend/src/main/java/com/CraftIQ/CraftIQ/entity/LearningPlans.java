@@ -37,7 +37,7 @@ public class LearningPlans {
     private String author;
 
     @Column(name = "status", nullable = false)
-    private String status;  // For example: "In Progress", "Completed", "Pending"
+    private String status;
 
     public LearningPlansDto toDto(ModelMapper mapper) {
         return mapper.map(this, LearningPlansDto.class);

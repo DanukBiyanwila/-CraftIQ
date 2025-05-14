@@ -34,5 +34,5 @@ public class Feedback {
     @Column(name = "like_count", nullable = false)
     private String likeCount;
 
-    // Removed relationship with SkillPosts
+
 }

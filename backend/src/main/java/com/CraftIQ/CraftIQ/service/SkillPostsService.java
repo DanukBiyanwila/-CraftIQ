@@ -5,6 +5,7 @@ import com.CraftIQ.CraftIQ.dto.SkillPostsDto;
 import java.util.List;
 
 public interface SkillPostsService {
+
     // Create a new SkillPost
     public SkillPostsDto postSkillPost(SkillPostsDto skillPostsDto);
 

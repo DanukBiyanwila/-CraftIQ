@@ -12,6 +12,8 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -26,12 +28,32 @@ public class UserServiceImpl implements UserService {
         // Convert DTO to Entity
         User user = mapper.map(userDto, User.class);
 
+        // Attach existing users as followers
+        if (userDto.getFollowers() != null && !userDto.getFollowers().isEmpty()) {
+            Set<User> followers = userDto.getFollowers().stream()
+                    .map(summary -> userRepository.findById(summary.getId())
+                            .orElseThrow(() -> new RuntimeException("Follower not found with ID: " + summary.getId())))
+                    .collect(Collectors.toSet());
+            user.setFollowers(followers);
+        }
+
+
+        // Attach existing users as following
+        if (userDto.getFollowing() != null && !userDto.getFollowing().isEmpty()) {
+            Set<User> following = userDto.getFollowing().stream()
+                    .map(summary -> userRepository.findById(summary.getId())
+                            .orElseThrow(() -> new RuntimeException("Following user not found with ID: " + summary.getId())))
+                    .collect(Collectors.toSet());
+            user.setFollowing(following);
+        }
+
         // Save Entity
         User savedUser = userRepository.save(user);
 
-        // Convert back to DTO and return
-        return mapper.map(savedUser, UserDto.class);
+        // Use custom toDto() to ensure correct follower/following mapping
+        return savedUser.toDto(mapper);
     }
+
 
     // Get all Users
     @Override

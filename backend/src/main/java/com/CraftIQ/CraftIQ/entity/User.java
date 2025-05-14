@@ -1,12 +1,18 @@
 package com.CraftIQ.CraftIQ.entity;
 
 import com.CraftIQ.CraftIQ.dto.UserDto;
+import com.CraftIQ.CraftIQ.dto.UserSummaryDto;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.modelmapper.ModelMapper;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Setter
 @Getter
@@ -38,10 +44,38 @@ public class User {
     @Column(name = "interests")
     private String interests;
 
+    // Users this user follows
+    @ManyToMany
+    @JoinTable(
+            name = "user_followers",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "follower_id")
+    )
+    private Set<User> followers = new HashSet<>();
+
+    // Users following this user
+    @ManyToMany(mappedBy = "followers")
+    private Set<User> following = new HashSet<>();
+
 
 
     public UserDto toDto(ModelMapper mapper) {
         UserDto userDto = mapper.map(this, UserDto.class);
+
+        if (this.getFollowers() != null) {
+            Set<UserSummaryDto> followerDtos = this.getFollowers().stream()
+                    .map(f -> mapper.map(f, UserSummaryDto.class))
+                    .collect(Collectors.toSet());
+            userDto.setFollowers(followerDtos);
+        }
+
+        if (this.getFollowing() != null) {
+            Set<UserSummaryDto> followingDtos = this.getFollowing().stream()
+                    .map(f -> mapper.map(f, UserSummaryDto.class))
+                    .collect(Collectors.toSet());
+            userDto.setFollowing(followingDtos);
+        }
         return userDto;
+
     }
 }

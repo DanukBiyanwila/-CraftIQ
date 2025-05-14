@@ -31,12 +31,6 @@ public class SkillPosts {
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
-
-    @Column(name = "author", nullable = false)
-    private String author;
-
     @Column(name = "category", nullable = false)
     private String category;
 

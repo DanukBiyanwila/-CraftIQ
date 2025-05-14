@@ -12,8 +12,6 @@ public class SkillPostsDto {
     private String title;
     private String description;
     private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
-    private String author;
     private String category;
     private String tags;
     private String imageUrl;
