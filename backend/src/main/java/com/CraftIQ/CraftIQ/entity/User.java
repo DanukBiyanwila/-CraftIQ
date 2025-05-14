@@ -1,9 +1,6 @@
 package com.CraftIQ.CraftIQ.entity;
 
-import com.CraftIQ.CraftIQ.dto.FeedbackDto;
-import com.CraftIQ.CraftIQ.dto.SkillPostsDto;
-import com.CraftIQ.CraftIQ.dto.UserDto;
-import com.CraftIQ.CraftIQ.dto.UserSummaryDto;
+import com.CraftIQ.CraftIQ.dto.*;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -65,6 +62,10 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<SkillPosts> skillPosts = new HashSet<>();
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<LearningPlans> learningPlans = new HashSet<>();
+
+
 
 
     public UserDto toDto(ModelMapper mapper) {
@@ -100,6 +101,14 @@ public class User {
                     .collect(Collectors.toSet());
             userDto.setSkillPosts(skillPostDtos);
         }
+
+        if (this.getLearningPlans() != null) {
+            Set<LearningPlansDto> learningPlansDto = this.getLearningPlans().stream()
+                    .map(plan -> mapper.map(plan, LearningPlansDto.class))
+                    .collect(Collectors.toSet());
+            userDto.setLearningPlans(learningPlansDto);
+        }
+
 
         return userDto;
     }

@@ -1,6 +1,7 @@
 package com.CraftIQ.CraftIQ.dto;
 
 import com.CraftIQ.CraftIQ.entity.Feedback;
+import com.CraftIQ.CraftIQ.entity.LearningPlans;
 import com.CraftIQ.CraftIQ.entity.SkillPosts;
 import com.CraftIQ.CraftIQ.entity.User;
 import lombok.Data;
@@ -27,6 +28,9 @@ public class UserDto {
 
     private Set<SkillPostsDto> skillPosts = new HashSet<>();
 
+    private Set<LearningPlansDto> learningPlans = new HashSet<>();
+
+
 
     public User toEntity(ModelMapper mapper) {
         User user = mapper.map(this, User.class);
@@ -52,6 +56,18 @@ public class UserDto {
 
             user.setSkillPosts(skillPostEntities); // link the skill posts to the user
         }
+
+        // Map learning plans if present
+        if (this.learningPlans != null) {
+            Set<LearningPlans> learningPlanEntities = this.learningPlans.stream().map(dto -> {
+                LearningPlans plan = mapper.map(dto, LearningPlans.class);
+                plan.setUser(user); // establish ownership of the plan
+                return plan;
+            }).collect(Collectors.toSet());
+
+            user.setLearningPlans(learningPlanEntities);
+        }
+
 
         return user;
     }

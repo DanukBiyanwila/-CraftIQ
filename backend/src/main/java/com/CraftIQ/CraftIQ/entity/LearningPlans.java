@@ -39,8 +39,18 @@ public class LearningPlans {
     @Column(name = "status", nullable = false)
     private String status;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
+
     public LearningPlansDto toDto(ModelMapper mapper) {
-        return mapper.map(this, LearningPlansDto.class);
+        LearningPlansDto dto = mapper.map(this, LearningPlansDto.class);
+        if (this.user != null) {
+            dto.setUserId(this.user.getId());
+        }
+        return dto;
     }
+
 }
 

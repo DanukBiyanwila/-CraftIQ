@@ -1,5 +1,6 @@
 package com.CraftIQ.CraftIQ.dto;
 
+import com.CraftIQ.CraftIQ.entity.User;
 import lombok.Data;
 import org.modelmapper.ModelMapper;
 import com.CraftIQ.CraftIQ.entity.LearningPlans;
@@ -14,8 +15,18 @@ public class LearningPlansDto {
     private String author;
     private String status;
 
+    private Long userId;
+
+
     // Convert DTO to Entity
     public LearningPlans toEntity(ModelMapper mapper) {
-        return mapper.map(this, LearningPlans.class);
+
+        LearningPlans plan = mapper.map(this, LearningPlans.class);
+        if (this.userId != null) {
+            User user = new User();
+            user.setId(this.userId); // set only ID for relation
+            plan.setUser(user);
+        }
+        return plan;
     }
 }
