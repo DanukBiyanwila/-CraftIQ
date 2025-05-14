@@ -2,6 +2,7 @@ package com.CraftIQ.CraftIQ.service.Impl;
 
 import com.CraftIQ.CraftIQ.dto.UserDto;
 import com.CraftIQ.CraftIQ.entity.Feedback;
+import com.CraftIQ.CraftIQ.entity.SkillPosts;
 import com.CraftIQ.CraftIQ.entity.User;
 import com.CraftIQ.CraftIQ.exception.NotFoundException;
 import com.CraftIQ.CraftIQ.repository.UserRepository;
@@ -60,6 +61,18 @@ public class UserServiceImpl implements UserService {
             user.setFeedbacks(feedbackEntities);
         }
 
+        // 5. Handle skillPosts (establish relationship between user and skill posts)
+        if (userDto.getSkillPosts() != null && !userDto.getSkillPosts().isEmpty()) {
+            Set<SkillPosts> skillPostEntities = userDto.getSkillPosts().stream()
+                    .map(dto -> {
+                        SkillPosts skillPost = dto.toEntity(mapper);
+                        skillPost.setUser(user); // Establish the relationship (user owns the post)
+                        return skillPost;
+                    })
+                    .collect(Collectors.toSet());
+            user.setSkillPosts(skillPostEntities); // Associate posts with the user
+        }
+
         // 5. Save Entity
         User savedUser = userRepository.save(user);
 
@@ -76,20 +89,24 @@ public class UserServiceImpl implements UserService {
         if (users.isEmpty()) {
             return new ArrayList<>();
         } else {
-            return users.stream().map(user -> mapper.map(user, UserDto.class)).toList();
+            return users.stream()
+                    .map(user -> user.toDto(mapper)) // Make sure to call the toDto method here
+                    .collect(Collectors.toList());
         }
     }
+
 
     // Get User by ID
     @Override
     public UserDto getUserById(Long id) {
         Optional<User> user = userRepository.findById(id);
         if (user.isPresent()) {
-            return mapper.map(user.get(), UserDto.class);
+            return user.get().toDto(mapper); // Use the same custom DTO mapping
         } else {
             throw new NotFoundException("User not found with ID: " + id);
         }
     }
+
 
     // Update User by ID
     @Override

@@ -1,6 +1,7 @@
 package com.CraftIQ.CraftIQ.entity;
 
 import com.CraftIQ.CraftIQ.dto.FeedbackDto;
+import com.CraftIQ.CraftIQ.dto.SkillPostsDto;
 import com.CraftIQ.CraftIQ.dto.UserDto;
 import com.CraftIQ.CraftIQ.dto.UserSummaryDto;
 import jakarta.persistence.*;
@@ -61,22 +62,26 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Feedback> feedbacks = new HashSet<>();
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<SkillPosts> skillPosts = new HashSet<>();
+
 
 
     public UserDto toDto(ModelMapper mapper) {
         UserDto userDto = mapper.map(this, UserDto.class);
 
+        // Manually converting PersistentSet to HashSet
         if (this.getFollowers() != null) {
-            Set<UserSummaryDto> followerDtos = this.getFollowers().stream()
+            Set<UserSummaryDto> followerDtos = new HashSet<>(this.getFollowers().stream()
                     .map(f -> mapper.map(f, UserSummaryDto.class))
-                    .collect(Collectors.toSet());
+                    .collect(Collectors.toSet()));
             userDto.setFollowers(followerDtos);
         }
 
         if (this.getFollowing() != null) {
-            Set<UserSummaryDto> followingDtos = this.getFollowing().stream()
+            Set<UserSummaryDto> followingDtos = new HashSet<>(this.getFollowing().stream()
                     .map(f -> mapper.map(f, UserSummaryDto.class))
-                    .collect(Collectors.toSet());
+                    .collect(Collectors.toSet()));
             userDto.setFollowing(followingDtos);
         }
 
@@ -87,7 +92,16 @@ public class User {
                     .collect(Collectors.toSet());
             userDto.setFeedbacks(feedbackDtos);
         }
-        return userDto;
 
+        // Adding skill posts to the DTO
+        if (this.getSkillPosts() != null) {
+            Set<SkillPostsDto> skillPostDtos = this.getSkillPosts().stream()
+                    .map(post -> mapper.map(post, SkillPostsDto.class))
+                    .collect(Collectors.toSet());
+            userDto.setSkillPosts(skillPostDtos);
+        }
+
+        return userDto;
     }
+
 }

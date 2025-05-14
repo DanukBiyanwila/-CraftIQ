@@ -1,6 +1,7 @@
 package com.CraftIQ.CraftIQ.dto;
 
 import com.CraftIQ.CraftIQ.entity.Feedback;
+import com.CraftIQ.CraftIQ.entity.SkillPosts;
 import com.CraftIQ.CraftIQ.entity.User;
 import lombok.Data;
 import org.modelmapper.ModelMapper;
@@ -24,6 +25,8 @@ public class UserDto {
 
     private Set<FeedbackDto> feedbacks = new HashSet<>();
 
+    private Set<SkillPostsDto> skillPosts = new HashSet<>();
+
 
     public User toEntity(ModelMapper mapper) {
         User user = mapper.map(this, User.class);
@@ -37,6 +40,17 @@ public class UserDto {
             }).collect(Collectors.toSet());
 
             user.setFeedbacks(feedbackEntities);
+        }
+
+        // Map skillPosts if present
+        if (this.skillPosts != null) {
+            Set<SkillPosts> skillPostEntities = this.skillPosts.stream().map(dto -> {
+                SkillPosts post = dto.toEntity(mapper);
+                post.setUser(user); // establish ownership of skill post by user
+                return post;
+            }).collect(Collectors.toSet());
+
+            user.setSkillPosts(skillPostEntities); // link the skill posts to the user
         }
 
         return user;

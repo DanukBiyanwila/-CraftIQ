@@ -3,6 +3,7 @@ package com.CraftIQ.CraftIQ.service.Impl;
 import com.CraftIQ.CraftIQ.dto.SkillPostsDto;
 import com.CraftIQ.CraftIQ.entity.Feedback;
 import com.CraftIQ.CraftIQ.entity.SkillPosts;
+import com.CraftIQ.CraftIQ.entity.User;
 import com.CraftIQ.CraftIQ.exception.NotFoundException;
 import com.CraftIQ.CraftIQ.repository.SkillPostsRepository;
 import com.CraftIQ.CraftIQ.service.SkillPostsService;
@@ -11,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -31,6 +33,11 @@ public class SkillPostsServiceImpl implements SkillPostsService {
         SkillPosts skillPost = new SkillPosts();
         mapper.map(skillPostsDto, skillPost);
 
+        // Ensure 'createdAt' is set to the current time if it is not already set in the DTO
+        if (skillPost.getCreatedAt() == null) {
+            skillPost.setCreatedAt(LocalDateTime.now());
+        }
+
         // Map and attach feedbacks (if any)
         if (skillPostsDto.getFeedbacks() != null && !skillPostsDto.getFeedbacks().isEmpty()) {
             List<Feedback> feedbackEntities = skillPostsDto.getFeedbacks().stream()
@@ -44,13 +51,18 @@ public class SkillPostsServiceImpl implements SkillPostsService {
             skillPost.setFeedbacks(feedbackEntities);
         }
 
-        // Save the SkillPost (with cascade, feedbacks will also be saved)
+        // Link the user to this skill post (based on the user in the SkillPostsDto)
+        if (skillPostsDto.getUser() != null) {
+            User user = mapper.map(skillPostsDto.getUser(), User.class);
+            skillPost.setUser(user); // Link the user to the skill post
+        }
+
+        // Save the SkillPost (with cascade, feedbacks, and user will also be saved)
         SkillPosts savedSkillPost = skillPostsRepository.save(skillPost);
 
         // Convert and return DTO
         return savedSkillPost.toDto(mapper);
     }
-
 
     // Get all SkillPosts
     @Override
