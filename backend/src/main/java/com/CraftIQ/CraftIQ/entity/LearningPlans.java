@@ -1,12 +1,16 @@
 package com.CraftIQ.CraftIQ.entity;
 
 import com.CraftIQ.CraftIQ.dto.LearningPlansDto;
+import com.CraftIQ.CraftIQ.dto.MilestoneDto;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.modelmapper.ModelMapper;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Setter
 @Getter
@@ -43,12 +47,24 @@ public class LearningPlans {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    // Milestones in this learning plan
+    @OneToMany(mappedBy = "learningPlan", cascade = CascadeType.ALL)
+    private List<Milestone> milestones;
+
 
     public LearningPlansDto toDto(ModelMapper mapper) {
         LearningPlansDto dto = mapper.map(this, LearningPlansDto.class);
         if (this.user != null) {
             dto.setUserId(this.user.getId());
         }
+        if (this.milestones != null) {
+            List<MilestoneDto> milestoneDtos = this.milestones.stream()
+                    .map(milestone -> mapper.map(milestone, MilestoneDto.class))
+                    .collect(Collectors.toList());
+            dto.setMilestones(milestoneDtos);
+        }
+
+
         return dto;
     }
 
