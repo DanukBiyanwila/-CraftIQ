@@ -1,15 +1,15 @@
 package com.CraftIQ.CraftIQ.entity;
 
-import com.CraftIQ.CraftIQ.dto.FeedbackDto;
-import com.CraftIQ.CraftIQ.dto.UserDto;
-import com.CraftIQ.CraftIQ.dto.UserSummaryDto;
+import com.CraftIQ.CraftIQ.dto.*;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.extern.java.Log;
 import org.modelmapper.ModelMapper;
 
+import java.util.Base64;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -30,6 +30,18 @@ public class User {
     @Column(name = "username", nullable = false, unique = true)
     private String username;
 
+    @Column(name = "full_name", unique = false)
+    private String fullName;
+
+    @Column(name = "tp_num", unique = false)
+    private String tpNum;
+
+    @Column(name = "address", unique = false)
+    private String address;
+
+    @Column(name = "category", unique = false)
+    private String category;
+
     @Column(name = "email", nullable = false, unique = true)
     private String email;
 
@@ -44,6 +56,14 @@ public class User {
 
     @Column(name = "interests")
     private String interests;
+
+    @Lob
+    @Column(name = "image_data", columnDefinition="LONGBLOB")
+    private byte[] imageData;
+
+
+    @Column(name = "role")
+    private String role;
 
     // Users this user follows
     @ManyToMany
@@ -61,22 +81,34 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Feedback> feedbacks = new HashSet<>();
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<SkillPosts> skillPosts = new HashSet<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<LearningPlans> learningPlans = new HashSet<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Like> likes = new HashSet<>();
+
+
+
 
 
     public UserDto toDto(ModelMapper mapper) {
         UserDto userDto = mapper.map(this, UserDto.class);
 
+        // Manually converting PersistentSet to HashSet
         if (this.getFollowers() != null) {
-            Set<UserSummaryDto> followerDtos = this.getFollowers().stream()
+            Set<UserSummaryDto> followerDtos = new HashSet<>(this.getFollowers().stream()
                     .map(f -> mapper.map(f, UserSummaryDto.class))
-                    .collect(Collectors.toSet());
+                    .collect(Collectors.toSet()));
             userDto.setFollowers(followerDtos);
         }
 
         if (this.getFollowing() != null) {
-            Set<UserSummaryDto> followingDtos = this.getFollowing().stream()
+            Set<UserSummaryDto> followingDtos = new HashSet<>(this.getFollowing().stream()
                     .map(f -> mapper.map(f, UserSummaryDto.class))
-                    .collect(Collectors.toSet());
+                    .collect(Collectors.toSet()));
             userDto.setFollowing(followingDtos);
         }
 
@@ -87,7 +119,31 @@ public class User {
                     .collect(Collectors.toSet());
             userDto.setFeedbacks(feedbackDtos);
         }
-        return userDto;
 
+        // Adding skill posts to the DTO
+        if (this.getSkillPosts() != null) {
+            Set<SkillPostsDto> skillPostDtos = this.getSkillPosts().stream()
+                    .map(post -> mapper.map(post, SkillPostsDto.class))
+                    .collect(Collectors.toSet());
+            userDto.setSkillPosts(skillPostDtos);
+        }
+
+        if (this.getLearningPlans() != null) {
+            Set<LearningPlansDto> learningPlansDto = this.getLearningPlans().stream()
+                    .map(plan -> mapper.map(plan, LearningPlansDto.class))
+                    .collect(Collectors.toSet());
+            userDto.setLearningPlans(learningPlansDto);
+        }
+
+        // Convert image byte[] to Base64 string
+        if (this.imageData != null) {
+            userDto.setImageBase64(Base64.getEncoder().encodeToString(this.imageData));
+        } else {
+            userDto.setImageBase64(null);
+        }
+
+
+        return userDto;
     }
+
 }

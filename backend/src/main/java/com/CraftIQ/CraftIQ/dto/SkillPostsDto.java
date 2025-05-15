@@ -1,6 +1,7 @@
 package com.CraftIQ.CraftIQ.dto;
 
 import com.CraftIQ.CraftIQ.entity.Feedback;
+import com.CraftIQ.CraftIQ.entity.User;
 import lombok.Data;
 import org.modelmapper.ModelMapper;
 import com.CraftIQ.CraftIQ.entity.SkillPosts;
@@ -22,6 +23,10 @@ public class SkillPostsDto {
     // List of feedbacks for this post
     private List<FeedbackDto> feedbacks = new ArrayList<>();
 
+    private UserSummaryDto user;
+
+    private List<LikeDto> likes;
+
     public SkillPosts toEntity(ModelMapper mapper) {
         SkillPosts post = mapper.map(this, SkillPosts.class);
 
@@ -34,6 +39,11 @@ public class SkillPostsDto {
             }).collect(Collectors.toList());
 
             post.setFeedbacks(feedbackEntities);
+        }
+
+        // Link the user to this skill post (you may want to handle user separately based on DTO)
+        if (this.user != null) {
+            post.setUser(mapper.map(this.user, User.class)); // You can map the user if it's passed
         }
 
         return post;

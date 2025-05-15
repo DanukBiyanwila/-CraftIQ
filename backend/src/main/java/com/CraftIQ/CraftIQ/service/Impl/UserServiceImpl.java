@@ -1,7 +1,10 @@
 package com.CraftIQ.CraftIQ.service.Impl;
 
+import com.CraftIQ.CraftIQ.dto.LoginRequestDto;
+import com.CraftIQ.CraftIQ.dto.LoginResponseDto;
 import com.CraftIQ.CraftIQ.dto.UserDto;
 import com.CraftIQ.CraftIQ.entity.Feedback;
+import com.CraftIQ.CraftIQ.entity.SkillPosts;
 import com.CraftIQ.CraftIQ.entity.User;
 import com.CraftIQ.CraftIQ.exception.NotFoundException;
 import com.CraftIQ.CraftIQ.repository.UserRepository;
@@ -9,11 +12,11 @@ import com.CraftIQ.CraftIQ.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.io.IOException;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -25,9 +28,15 @@ public class UserServiceImpl implements UserService {
 
     // Create User
     @Override
-    public UserDto createUser(UserDto userDto) {
+    public UserDto createUser(UserDto userDto , MultipartFile image) throws IOException {
         // 1. Convert DTO to Entity
         User user = mapper.map(userDto, User.class);
+
+        // Handle Image Upload
+        if (image != null && !image.isEmpty()) {
+            user.setImageData(image.getBytes());
+        }
+
 
         // 2. Handle followers
         if (userDto.getFollowers() != null && !userDto.getFollowers().isEmpty()) {
@@ -60,11 +69,30 @@ public class UserServiceImpl implements UserService {
             user.setFeedbacks(feedbackEntities);
         }
 
+        // 5. Handle skillPosts (establish relationship between user and skill posts)
+        if (userDto.getSkillPosts() != null && !userDto.getSkillPosts().isEmpty()) {
+            Set<SkillPosts> skillPostEntities = userDto.getSkillPosts().stream()
+                    .map(dto -> {
+                        SkillPosts skillPost = dto.toEntity(mapper);
+                        skillPost.setUser(user); // Establish the relationship (user owns the post)
+                        return skillPost;
+                    })
+                    .collect(Collectors.toSet());
+            user.setSkillPosts(skillPostEntities); // Associate posts with the user
+        }
+
         // 5. Save Entity
         User savedUser = userRepository.save(user);
 
         // 6. Return DTO
-        return savedUser.toDto(mapper);
+        UserDto savedDto = savedUser.toDto(mapper);
+
+        if (savedUser.getImageData() != null) {
+            savedDto.setImageBase64(Base64.getEncoder().encodeToString(savedUser.getImageData()));
+        }
+
+        return savedDto;
+
     }
 
 
@@ -76,20 +104,22 @@ public class UserServiceImpl implements UserService {
         if (users.isEmpty()) {
             return new ArrayList<>();
         } else {
-            return users.stream().map(user -> mapper.map(user, UserDto.class)).toList();
+            return users.stream()
+                    .map(user -> user.toDto(mapper))  // this calls toDto including image conversion
+                    .collect(Collectors.toList());
         }
     }
 
-    // Get User by ID
     @Override
     public UserDto getUserById(Long id) {
         Optional<User> user = userRepository.findById(id);
         if (user.isPresent()) {
-            return mapper.map(user.get(), UserDto.class);
+            return user.get().toDto(mapper);  // this calls toDto including image conversion
         } else {
             throw new NotFoundException("User not found with ID: " + id);
         }
     }
+
 
     // Update User by ID
     @Override
@@ -98,15 +128,20 @@ public class UserServiceImpl implements UserService {
             throw new NotFoundException("User not found with ID: " + id);
         }
 
-        // Retrieve the existing user from the database
         User existingUser = userRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("User not found with ID: " + id));
 
-        // Map the other fields from DTO to Entity
         User user = mapper.map(userDto, User.class);
         user.setId(id);
 
-        // Handle followers update
+        // Image handling added here
+        if (userDto.getImageBase64() != null && !userDto.getImageBase64().isEmpty()) {
+            user.setImageData(Base64.getDecoder().decode(userDto.getImageBase64()));
+        } else {
+            user.setImageData(existingUser.getImageData());
+        }
+
+        // Followers
         if (userDto.getFollowers() != null && !userDto.getFollowers().isEmpty()) {
             Set<User> followers = userDto.getFollowers().stream()
                     .map(summary -> userRepository.findById(summary.getId())
@@ -114,11 +149,10 @@ public class UserServiceImpl implements UserService {
                     .collect(Collectors.toSet());
             user.setFollowers(followers);
         } else {
-            // If no followers are provided, retain the existing ones
             user.setFollowers(existingUser.getFollowers());
         }
 
-        // Handle following update
+        // Following
         if (userDto.getFollowing() != null && !userDto.getFollowing().isEmpty()) {
             Set<User> following = userDto.getFollowing().stream()
                     .map(summary -> userRepository.findById(summary.getId())
@@ -126,26 +160,61 @@ public class UserServiceImpl implements UserService {
                     .collect(Collectors.toSet());
             user.setFollowing(following);
         } else {
-            // If no following users are provided, retain the existing ones
             user.setFollowing(existingUser.getFollowing());
         }
 
-        // Save the updated user entity
+        // Feedbacks (updating on existingUser - keep as is)
+        if (userDto.getFeedbacks() != null) {
+            existingUser.getFeedbacks().clear();
+            Set<Feedback> updatedFeedbacks = userDto.getFeedbacks().stream()
+                    .map(dto -> {
+                        Feedback feedback = mapper.map(dto, Feedback.class);
+                        feedback.setUser(existingUser);
+                        return feedback;
+                    }).collect(Collectors.toSet());
+            existingUser.getFeedbacks().addAll(updatedFeedbacks);
+        }
+
+        // SkillPosts (updating on existingUser - keep as is)
+        if (userDto.getSkillPosts() != null) {
+            existingUser.getSkillPosts().clear();
+            Set<SkillPosts> updatedPosts = userDto.getSkillPosts().stream()
+                    .map(dto -> {
+                        SkillPosts post = dto.toEntity(mapper);
+                        post.setUser(existingUser);
+                        return post;
+                    }).collect(Collectors.toSet());
+            existingUser.getSkillPosts().addAll(updatedPosts);
+        }
+
         User savedUser = userRepository.save(user);
 
-        // Use custom toDto() to ensure correct follower/following mapping
         return savedUser.toDto(mapper);
     }
 
+
     // Delete User by ID
     @Override
-    public boolean deleteUser(Long id) {
-        if (!userRepository.existsById(id)) {
-            throw new NotFoundException("User not found with ID: " + id);
+    @Transactional
+    public void deleteUser(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("User not found with ID: " + userId));
+
+        // Remove the user from other users' followers and following lists
+        for (User follower : user.getFollowers()) {
+            follower.getFollowing().remove(user);
         }
-        userRepository.deleteById(id);
-        return true;
+
+        for (User followed : user.getFollowing()) {
+            followed.getFollowers().remove(user);
+        }
+
+        user.getFollowers().clear();
+        user.getFollowing().clear();
+
+        userRepository.delete(user);
     }
+
 
     // Get User by Username
     @Override
@@ -168,4 +237,43 @@ public class UserServiceImpl implements UserService {
             throw new NotFoundException("User not found with email: " + email);
         }
     }
+
+    @Override
+    public LoginResponseDto authenticateUser(LoginRequestDto loginRequestDto) {
+        // Find the user by email
+        User user = userRepository.findByEmail(loginRequestDto.getEmail())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        // Check if the password is correct
+        if (!user.getPassword().equals(loginRequestDto.getPassword())) {
+            throw new RuntimeException("Invalid password");
+        }
+
+        // Check if the role is empty or not
+        String role = user.getRole();
+        if (role == null || role.isEmpty()) {
+            // User has no role assigned, treat as normal user
+            role = "USER";  // Default to "USER" if role is empty
+        }
+
+        if ("ADMIN".equalsIgnoreCase(role)) {
+            // Admin specific logic (if needed)
+            // You can return different responses or tokens for admin users
+        } else if ("USER".equalsIgnoreCase(role)) {
+            // User specific logic (if needed)
+            // You can return different responses or tokens for normal users
+        } else {
+            throw new RuntimeException("Invalid role");
+        }
+
+        // Response DTO setup
+        LoginResponseDto response = new LoginResponseDto();
+        response.setMessage("Login successful");
+        response.setUserId(user.getId());
+        response.setEmail(user.getEmail());
+        response.setRole(role);
+
+        return response;
+    }
+
 }
