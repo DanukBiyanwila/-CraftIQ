@@ -15,57 +15,91 @@ const [author, setAuthor] = useState(null);
   // Optionally: handle comments
   const [comments, setComments] = useState([]);
 
-  useEffect(() => {
+useEffect(() => {
+  setLoading(true);
+
+  // Fetch Skill Post
   axios.get(`http://localhost:8086/api/skillposts/${id}`)
-  .then(response => {
-    const post = response.data;
-    const formattedPost = {
-      id: post.id,
-      img: post.imageBase64
-        ? `data:image/jpeg;base64,${post.imageBase64}`
-        : '',
-      title: post.title,
-      summary: post.summary,
-      pargrhap_1: post.pargrhap1,
-      pargrhap_2: post.pargrhap2,
-      pargrhap_3: post.pargrhap3,
-      pargrhap_4: post.pargrhap4,
-      pargrhap_5: post.pargrhap5,
-      category: post.category || "General",
-      commentCount: post.commentCount || 0,
-      user: post.user,
-    };
+    .then(response => {
+      const post = response.data;
+      const formattedPost = {
+        id: post.id,
+        img: post.imageBase64 ? `data:image/jpeg;base64,${post.imageBase64}` : '',
+        title: post.title,
+        summary: post.summary,
+        pargrhap_1: post.pargrhap1,
+        pargrhap_2: post.pargrhap2,
+        pargrhap_3: post.pargrhap3,
+        pargrhap_4: post.pargrhap4,
+        pargrhap_5: post.pargrhap5,
+        category: post.category || "General",
+        commentCount: post.commentCount || 0,
+        user: post.user,
+      };
 
-    setSkillPost(formattedPost);
+      setSkillPost(formattedPost);
 
-    // Fetch author data
-    if (post.user && post.user.id) {
-      axios.get(`http://localhost:8086/api/user/${post.user.id}`)
-        .then(userResponse => {
-          const userData = userResponse.data;
-          const formattedAuthor = {
-            fullName: userData.fullName,
-            profileImage: userData.imageBase64
-              ? `data:image/jpeg;base64,${userData.imageBase64}`
-              : '',
-          };
-          setAuthor(formattedAuthor);
+      // Fetch author
+      if (post.user && post.user.id) {
+        axios.get(`http://localhost:8086/api/user/${post.user.id}`)
+          .then(userResponse => {
+            const userData = userResponse.data;
+            setAuthor({
+              fullName: userData.fullName,
+              profileImage: userData.imageBase64
+                ? `data:image/jpeg;base64,${userData.imageBase64}` : '',
+            });
+          });
+      }
+
+      // Fetch all feedbacks and filter by skillPostId
+      axios.get(`http://localhost:8086/api/feedback/`)
+        .then(async feedbackRes => {
+          const allFeedbacks = feedbackRes.data;
+
+          // Filter feedbacks for this skillPost
+          const filteredFeedbacks = allFeedbacks.filter(fb => fb.skillPostId === post.id);
+
+          // Enrich feedbacks with user data
+          const enrichedComments = await Promise.all(
+            filteredFeedbacks.map(async (feedback) => {
+              try {
+                const userRes = await axios.get(`http://localhost:8086/api/user/${feedback.userId}`);
+                const user = userRes.data;
+                return {
+                  id: feedback.id,
+                  img: user.imageBase64 ? `data:image/jpeg;base64,${user.imageBase64}` : '',
+                  author: user.fullName,
+                  pargrhap: feedback.comment,
+                  date: new Date(feedback.createdAt).toLocaleDateString(),
+                };
+              } catch (err) {
+                console.error("Error loading user for feedback", err);
+                return {
+                  id: feedback.id,
+                  img: '',
+                  author: 'Unknown',
+                  pargrhap: feedback.comment,
+                  date: new Date(feedback.createdAt).toLocaleDateString(),
+                };
+              }
+            })
+          );
+
+          setComments(enrichedComments);
+          setLoading(false);
         })
         .catch(err => {
-          console.error("Error fetching author:", err);
+          console.error("Error fetching feedbacks", err);
+          setLoading(false);
         });
-    }
+    })
+    .catch(error => {
+      console.error("Error fetching skill post:", error);
+      setLoading(false);
+    });
+}, [id]);
 
-    setLoading(false);
-  })
-  .catch(error => {
-    console.error("Error fetching skill post:", error);
-    setLoading(false);
-  });
-
-
-
-  }, [id]);
 
   if (loading) return <div>Loading...</div>;
   if (!skillPost) return <div>Post not found</div>;
@@ -77,12 +111,13 @@ const [author, setAuthor] = useState(null);
           <div className="col-lg-8 posts-list">
             <SkillPostSingle skillPost={skillPost}  author={author} />
 
-            <div className="comments-area">
-              <h4>{comments.length} Comments</h4>
-              {CommentData.slice(0, 4).map(comment => (
-                <CommentView key={comment.id} comment={comment} />
-              ))}
-            </div>
+           <div className="comments-area">
+  <h4>{comments.length} Comments</h4>
+  {comments.map(comment => (
+    <CommentView key={comment.id} comment={comment} />
+  ))}
+</div>
+
 
             <CommentCreate postId={id} />
           </div>
