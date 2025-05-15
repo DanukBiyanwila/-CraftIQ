@@ -103,39 +103,39 @@ function FeeadbackManagment() {
   }, [loggedInUserId]);
 
   const handleDeleteClick = async (id) => {
-  const confirmed = await Swal.fire({
-    title: 'Are you sure?',
-    text: 'You will not be able to recover this feedback!',
-    icon: 'warning',
-    showCancelButton: true,
-    confirmButtonColor: '#d33',
-    cancelButtonColor: '#3085d6',
-    confirmButtonText: 'Yes, delete it!'
-  });
+    const confirmed = await Swal.fire({
+      title: 'Are you sure?',
+      text: 'You will not be able to recover this feedback!',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Yes, delete it!'
+    });
 
-  if (confirmed.isConfirmed) {
-    try {
-      await axios.delete(`http://localhost:8086/api/feedback/${id}`);
-      setUserComments(prev => prev.filter(comment => comment.id !== id));
+    if (confirmed.isConfirmed) {
+      try {
+        await axios.delete(`http://localhost:8086/api/feedback/${id}`);
+        setUserComments(prev => prev.filter(comment => comment.id !== id));
 
-      Swal.fire({
-        title: 'Deleted!',
-        text: 'Your feedback has been deleted.',
-        icon: 'success',
-        timer: 1500,
-        showConfirmButton: false
-      });
-    } catch (error) {
-      console.error("Error deleting feedback:", error);
-      Swal.fire({
-        title: 'Error!',
-        text: 'Failed to delete feedback.',
-        icon: 'error',
-        confirmButtonText: 'OK'
-      });
+        Swal.fire({
+          title: 'Deleted!',
+          text: 'Your feedback has been deleted.',
+          icon: 'success',
+          timer: 1500,
+          showConfirmButton: false
+        });
+      } catch (error) {
+        console.error("Error deleting feedback:", error);
+        Swal.fire({
+          title: 'Error!',
+          text: 'Failed to delete feedback.',
+          icon: 'error',
+          confirmButtonText: 'OK'
+        });
+      }
     }
-  }
-};
+  };
 
 
 
@@ -208,9 +208,9 @@ function FeeadbackManagment() {
 
                 )}
 
-             <button className="btn btn-danger" onClick={() => handleDeleteClick(comment.id)}>
-  Delete
-</button>
+                <button className="btn btn-danger" onClick={() => handleDeleteClick(comment.id)}>
+                  Delete
+                </button>
 
               </div>
             ))}

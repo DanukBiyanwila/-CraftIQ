@@ -37,9 +37,14 @@ function UserCard() {
             <div className="mt-3">
               <h4>{userData.fullName || ' '}</h4>
               <p className="text-secondary mb-1">{userData.category || ' '}</p>
-              <p className="text-muted font-size-sm">{userData.address || ' '}</p>
-              <p className="text-muted font-size-sm">Followers : {userData.followers || 0}</p>
-              <p className="text-muted font-size-sm">Following : {userData.following || 0}</p>
+              <p className="text-muted font-size-sm">{userData.address || ''}</p>
+           <p className="text-muted font-size-sm">
+  Followers : {Array.isArray(userData.followers) ? userData.followers.length : 0}
+</p>
+<p className="text-muted font-size-sm">
+  Following : {Array.isArray(userData.following) ? userData.following.length : 0}
+</p>
+
             </div>
           </div>
         </div>  

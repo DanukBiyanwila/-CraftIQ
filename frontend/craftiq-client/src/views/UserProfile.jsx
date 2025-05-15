@@ -130,13 +130,13 @@ function UserProfile() {
                     </div>
                   </div>
                 </div>
-                {UserData.slice(0, 6).map(user => (
+                {/* {UserData.slice(0, 6).map(user => (
                   <SingleUser key={user.id} user={user} />
-                ))}
+                ))} */}
 
                 <div className="col-sm-12">
                
-                  <Link to="/user/find-user"className="btn btn-info " >Find User</Link>
+                  {/* <Link to="/user/find-user"className="btn btn-info " >Find User</Link> */}
                 </div>
               </div>
             </div>

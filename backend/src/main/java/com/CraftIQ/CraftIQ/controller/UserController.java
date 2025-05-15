@@ -3,14 +3,18 @@ package com.CraftIQ.CraftIQ.controller;
 import com.CraftIQ.CraftIQ.dto.LoginRequestDto;
 import com.CraftIQ.CraftIQ.dto.LoginResponseDto;
 import com.CraftIQ.CraftIQ.dto.UserDto;
+import com.CraftIQ.CraftIQ.entity.User;
 import com.CraftIQ.CraftIQ.service.Impl.UserServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 
 @RestController
@@ -78,4 +82,32 @@ public class UserController {
         LoginResponseDto response = userService.authenticateUser(loginDto);
         return ResponseEntity.ok(response);
     }
+    @GetMapping("/{id}/image")
+    public ResponseEntity<byte[]> getUserImage(@PathVariable Long id) {
+        User user = userService.findById(id);
+        if (user == null || user.getImageData() == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        String contentType = "image/jpeg"; // fallback
+        try {
+            // Use .jpg as extension to help probe detect correct MIME type
+            Path tempFile = Files.createTempFile("img-", ".jpg");
+            Files.write(tempFile, user.getImageData());
+            String detectedType = Files.probeContentType(tempFile);
+            if (detectedType != null) {
+                contentType = detectedType;
+            }
+            Files.deleteIfExists(tempFile);
+        } catch (IOException e) {
+            System.err.println("Failed to detect image type: " + e.getMessage());
+        }
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(contentType))
+                .body(user.getImageData());
+    }
+
+
+
 }

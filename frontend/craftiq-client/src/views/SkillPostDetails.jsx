@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import CommentView from '../components/CommentView'
-import CommentData from '../data/CommentData'
 import CommentCreate from '../components/CommentCreate'
 import SlideBar from '../components/SlideBar'
 import SkillPostSingle from '../components/skillPost/SkillPostSingle'
@@ -33,7 +32,7 @@ function SkillPostDetails() {
           pargrhap_4: post.pargrhap4,
           pargrhap_5: post.pargrhap5,
           category: post.category || "General",
-          commentCount: post.commentCount || 0,
+           commentCount: Array.isArray(post.feedbacks) ? post.feedbacks.length : 0,
           user: post.user,
         };
 

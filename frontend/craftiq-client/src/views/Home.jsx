@@ -23,8 +23,8 @@ function Home() {
           pargrhap3: post.pargrhap3,
           pargrhap4: post.pargrhap4,
           pargrhap5: post.pargrhap5,
-          category: post.category || "General",
-          commentCount: post.commentCount || 0,
+          username: post.user?.username || "General",
+          commentCount: Array.isArray(post.feedbacks) ? post.feedbacks.length : 0,
           date: [
             {
               day: new Date(post.createdAt).getDate(),
@@ -48,7 +48,7 @@ function Home() {
         <div className="container">
           <div className="row">
             <div className="col-lg-8 mb-5 mb-lg-0">
-              {allSkillPosts.slice(0, 8).map((skillpost) => (
+              {allSkillPosts.map((skillpost) => (
                 <AllPost key={skillpost.id} skillpost={skillpost} />
               ))}
             </div>
