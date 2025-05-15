@@ -1,41 +1,68 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import axios from "axios";
+import Swal from "sweetalert2";
+function EditLearningPlan() {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const [learningPlan, setLearningPlan] = useState(null);
+  const [title, setTitle] = useState("");
+  const [weeks, setWeeks] = useState([]);
 
-function EditLearningPlan({ LearningPlane }) {
-  const [title, setTitle] = useState(LearningPlane.title);
-  const [weeks, setWeeks] = useState(LearningPlane.weeks);
+  // Fetch the learning plan
+  useEffect(() => {
+    axios
+      .get(`http://localhost:8086/api/learningPlans/${id}`)
+      .then((res) => {
+        const data = res.data;
+
+        // Convert backend format to frontend format
+        const weekObjects = data.weeks.map((week, index) => ({
+          week,
+          milestones: data.milestones.slice(index * 3, index * 3 + 3) || [],
+        }));
+
+        setLearningPlan(data);
+        setTitle(data.title);
+        setWeeks(weekObjects);
+      })
+      .catch((err) => {
+        console.error("Error fetching learning plan:", err);
+      });
+  }, [id]);
 
   const addMilestone = (weekIndex) => {
-  const updatedWeeks = [...weeks];
-  if (updatedWeeks[weekIndex].milestones.length < 3) {
-    updatedWeeks[weekIndex].milestones.push({
-      title: "",
-      date: "",
-      completed: false,
-    });
-    setWeeks(updatedWeeks);
-  }
-};
+    const updatedWeeks = [...weeks];
+    if (updatedWeeks[weekIndex].milestones.length < 3) {
+      updatedWeeks[weekIndex].milestones.push({
+        title: "",
+        date: "",
+        completed: false,
+      });
+      setWeeks(updatedWeeks);
+    }
+  };
 
-const addWeek = () => {
-  setWeeks([
-    ...weeks,
-    {
-      week: `Week ${weeks.length + 1}`,
-      milestones: [
-        {
-          title: "",
-          date: "",
-          completed: false,
-        },
-      ],
-    },
-  ]);
-};
-
+  const addWeek = () => {
+    setWeeks([
+      ...weeks,
+      {
+        week: `Week ${weeks.length + 1}`,
+        milestones: [
+          {
+            title: "",
+            date: "",
+            completed: false,
+          },
+        ],
+      },
+    ]);
+  };
 
   const handleMilestoneChange = (weekIndex, milestoneIndex, field, value) => {
     const updatedWeeks = [...weeks];
-    updatedWeeks[weekIndex].milestones[milestoneIndex][field] = field === "completed" ? value === "true" : value;
+    updatedWeeks[weekIndex].milestones[milestoneIndex][field] =
+      field === "completed" ? value === "true" : value;
     setWeeks(updatedWeeks);
   };
 
@@ -45,15 +72,40 @@ const addWeek = () => {
     setWeeks(updatedWeeks);
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
+    const updatedMilestones = weeks.flatMap((w) => w.milestones);
+    const updatedWeekStrings = weeks.map((w) => w.week);
+
     const updatedPlan = {
-      ...LearningPlane,
+      ...learningPlan,
       title,
-      weeks
+      weeks: updatedWeekStrings,
+      milestones: updatedMilestones,
     };
-    console.log("Updated Learning Plan:", updatedPlan);
-    // You can add an API call here or send this to the backend
+try {
+  await axios.put(`http://localhost:8086/api/learningPlans/${id}`, updatedPlan);
+
+  Swal.fire({
+    icon: "success",
+    title: "Updated!",
+    text: "Learning Plan updated successfully!",
+    confirmButtonColor: "#3085d6"
+  });
+
+  navigate("/user/learning-plane");
+} catch (err) {
+  console.error("Failed to update plan:", err);
+
+  Swal.fire({
+    icon: "error",
+    title: "Update Failed",
+    text: "Failed to update the learning plan.",
+    confirmButtonColor: "#d33"
+  });
+}
   };
+
+  if (!learningPlan) return <p>Loading...</p>;
 
   return (
     <div className="container mb-50 mt-50">
@@ -67,81 +119,96 @@ const addWeek = () => {
         />
       </div>
 
-     <div className="row">
-  <div className="col-md-12">
-    <div className="schedule-table">
-      <table className="table bg-white">
-        <tbody>
-          {weeks.map((weekObj, weekIndex) => (
-            <tr key={weekIndex}>
-              <td className="day" style={{ minWidth: "150px" }}>
-                <input
-                  type="text"
-                  value={weekObj.week}
-                  onChange={(e) => handleWeekChange(weekIndex, e.target.value)}
-                  className="form-control mb-2"
-                />
-                <button
-                  className="btn btn-sm btn-success"
-                  onClick={() => addMilestone(weekIndex)}
-                  disabled={weekObj.milestones.length >= 3}
-                >
-                  + Milestone
-                </button>
-              </td>
+      <div className="row">
+        <div className="col-md-12">
+          <div className="schedule-table">
+            <table className="table bg-white">
+              <tbody>
+                {weeks.map((weekObj, weekIndex) => (
+                  <tr key={weekIndex}>
+                    <td className="day" style={{ minWidth: "150px" }}>
+                      <input
+                        type="text"
+                        value={weekObj.week}
+                        onChange={(e) =>
+                          handleWeekChange(weekIndex, e.target.value)
+                        }
+                        className="form-control mb-2"
+                      />
+                      <button
+                        className="btn btn-sm btn-success"
+                        onClick={() => addMilestone(weekIndex)}
+                        disabled={weekObj.milestones.length >= 3}
+                      >
+                        + Milestone
+                      </button>
+                    </td>
 
-              {weekObj.milestones.map((milestone, i) => (
-                <td className="active" key={i}>
-                  <input
-                    type="text"
-                    value={milestone.title}
-                    onChange={(e) =>
-                      handleMilestoneChange(weekIndex, i, "title", e.target.value)
-                    }
-                    className="form-control mb-2"
-                    placeholder="Milestone Title"
-                  />
-                  <input
-                    type="date"
-                    value={milestone.date}
-                    onChange={(e) =>
-                      handleMilestoneChange(weekIndex, i, "date", e.target.value)
-                    }
-                    className="form-control mb-2"
-                  />
-                  <select
-                    className="form-control"
-                    value={milestone.completed}
-                    onChange={(e) =>
-                      handleMilestoneChange(weekIndex, i, "completed", e.target.value)
-                    }
-                  >
-                    <option value="false">Incomplete</option>
-                    <option value="true">Completed</option>
-                  </select>
-                </td>
-              ))}
+                    {weekObj.milestones.map((milestone, i) => (
+                      <td className="active" key={i}>
+                        <input
+                          type="text"
+                          value={milestone.title}
+                          onChange={(e) =>
+                            handleMilestoneChange(
+                              weekIndex,
+                              i,
+                              "title",
+                              e.target.value
+                            )
+                          }
+                          className="form-control mb-2"
+                          placeholder="Milestone Title"
+                        />
+                        <input
+                          type="text"
+                          value={milestone.date}
+                          onChange={(e) =>
+                            handleMilestoneChange(
+                              weekIndex,
+                              i,
+                              "date",
+                              e.target.value
+                            )
+                          }
+                          className="form-control mb-2"
+                          placeholder="Date or Description"
+                        />
+                        <select
+                          className="form-control"
+                          value={milestone.completed}
+                          onChange={(e) =>
+                            handleMilestoneChange(
+                              weekIndex,
+                              i,
+                              "completed",
+                              e.target.value
+                            )
+                          }
+                        >
+                          <option value="false">Incomplete</option>
+                          <option value="true">Completed</option>
+                        </select>
+                      </td>
+                    ))}
 
-              {/* Fill remaining cells if < 3 milestones */}
-              {weekObj.milestones.length < 3 &&
-                [...Array(3 - weekObj.milestones.length)].map((_, i) => (
-                  <td key={`empty-${i}`} />
+                    {weekObj.milestones.length < 3 &&
+                      [...Array(3 - weekObj.milestones.length)].map((_, i) => (
+                        <td key={`empty-${i}`} />
+                      ))}
+                  </tr>
                 ))}
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+              </tbody>
+            </table>
+          </div>
 
-    {/* Add Week Button */}
-    <div className="text-center mt-3">
-      <button className="btn btn-primary" onClick={addWeek}>
-        + Add Week
-      </button>
-    </div>
-  </div>
-</div>
-
+          <div className="text-center mt-3">
+            <button className="btn btn-primary" onClick={addWeek}>
+              + Add Week
+            </button>
+          </div>
+        </div>
+      </div>
 
       <div className="text-center mt-4">
         <button className="btn btn-second" onClick={handleSave}>

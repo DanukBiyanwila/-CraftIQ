@@ -55,16 +55,17 @@ public class FeedbackServiceImpl implements FeedbackService {
     public List<FeedbackDto> getAllFeedback() {
         List<Feedback> feedbackList = feedbackRepository.findAll();
         return feedbackList.stream()
-                .map(feedback -> mapper.map(feedback, FeedbackDto.class))
+                .map(feedback -> feedback.toDto(mapper)) // Use your custom method
                 .collect(Collectors.toList());
     }
+
 
     // Get Feedback by ID
     @Override
     public FeedbackDto getFeedbackById(Long id) {
         Feedback feedback = feedbackRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Feedback not found with ID: " + id));
-        return mapper.map(feedback, FeedbackDto.class);
+        return feedback.toDto(mapper); // Use your custom method
     }
 
     // Update Feedback

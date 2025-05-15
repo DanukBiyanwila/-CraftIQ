@@ -4,6 +4,7 @@ import SingleBlog from '../components/blog/SingleBlog';
 import { Link } from 'react-router-dom';
 import UserCard from '../components/UserProfile/UserCard';
 import SingleUser from '../components/UserProfile/SingleUser';
+import UserDetails from '../components/UserProfile/UserDetails';
 function UserProfile() {
   return (
     <div className="profile">
@@ -67,57 +68,10 @@ function UserProfile() {
             <div className="col-md-8">
               <div className="card mb-3">
                 <div className="card-body">
-                  <div className="row">
-                    <div className="col-sm-3">
-                      <h6 className="mb-0">Full Name</h6>
-                    </div>
-                    <div className="col-sm-9 text-secondary">
-                      Kenneth Valdez
-                    </div>
-                  </div>
-                  <hr />
-                  <div className="row">
-                    <div className="col-sm-3">
-                      <h6 className="mb-0">Email</h6>
-                    </div>
-                    <div className="col-sm-9 text-secondary">
-                      fip@jukmuh.al
-                    </div>
-                  </div>
-                  <hr />
-                  <div className="row">
-                    <div className="col-sm-3">
-                      <h6 className="mb-0">Phone</h6>
-                    </div>
-                    <div className="col-sm-9 text-secondary">
-                      (239) 816-9029
-                    </div>
-                  </div>
-                  <hr />
-                  <div className="row">
-                    <div className="col-sm-3">
-                      <h6 className="mb-0">Mobile</h6>
-                    </div>
-                    <div className="col-sm-9 text-secondary">
-                      (320) 380-4539
-                    </div>
-                  </div>
-                  <hr />
-                  <div className="row">
-                    <div className="col-sm-3">
-                      <h6 className="mb-0">Address</h6>
-                    </div>
-                    <div className="col-sm-9 text-secondary">
-                      Bay Area, San Francisco, CA
-                    </div>
-                  </div>
-                  <hr />
-                  <div className="row">
-                    <div className="col-sm-12">
-                      <Link to="/user/user-edit" className="btn btn-info ">Edit</Link>
-                      <Link to="/user/user-edit" className="btn btn-info ml-3 ">Delete</Link>
-                    </div>
-                  </div>
+                 
+
+                 <UserDetails/>
+                 
                 </div>
               </div>
 
@@ -176,13 +130,13 @@ function UserProfile() {
                     </div>
                   </div>
                 </div>
-                {UserData.slice(0, 6).map(user => (
+                {/* {UserData.slice(0, 6).map(user => (
                   <SingleUser key={user.id} user={user} />
-                ))}
+                ))} */}
 
                 <div className="col-sm-12">
                
-                  <Link to="/user/find-user"className="btn btn-info " >Find User</Link>
+                  {/* <Link to="/user/find-user"className="btn btn-info " >Find User</Link> */}
                 </div>
               </div>
             </div>

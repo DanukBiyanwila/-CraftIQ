@@ -4,7 +4,7 @@ import singleblog1 from "../../assets/clients/img/blog/single_blog_1.png"
 import author from "../../assets/clients/img/blog/author.png"
 import next from "../../assets/clients/img/post/next.png"
 import preview from "../../assets/clients/img/post/preview.png"
-function SkillPostSingle( {skillPost} ) {
+function SkillPostSingle( {skillPost, author } ) {
   return (
       <div>
             <div className="single-post">
@@ -15,8 +15,8 @@ function SkillPostSingle( {skillPost} ) {
                       <h2> {skillPost.title}
                       </h2>
                       <ul className="blog-info-link mt-3 mb-4">
-                        <li><a href="#"><i className="fa fa-user" /> Travel, Lifestyle</a></li>
-                        <li><a href="#"><i className="fa fa-comments" /> 03 Comments</a></li>
+                        <li><a href="#"><i className="fa fa-user" /> {author.fullName}</a></li>
+                        <li><a href="#"><i className="fa fa-comments" /> {skillPost.commentCount}</a></li>
                       </ul>
                       <p className="excert">
                         {skillPost.pargrhap_1}
@@ -53,18 +53,23 @@ function SkillPostSingle( {skillPost} ) {
                     </div>
                
                   </div>
-                  <div className="blog-author">
-                    <div className="media align-items-center">
-                      <img src={author} alt="" />
-                      <div className="media-body">
-                        <a href="#">
-                          <h4>Harvard milan</h4>
-                        </a>
-                        <p>Second divided from form fish beast made. Every of seas all gathered use saying you're, he
-                          our dominion twon Second divided from</p>
-                      </div>
-                    </div>
-                  </div>
+                 <div className="blog-author">
+        <div className="media align-items-center">
+          {author?.profileImage && (
+            <img
+              src={author.profileImage}
+              alt={author.fullName}
+              style={{ width: "70px", height: "70px", borderRadius: "50%" }}
+            />
+          )}
+          <div className="media-body">
+            <a href="#">
+              <h4>{author?.fullName || "Unknown Author"}</h4>
+            </a>
+            <p>{skillPost.summary}</p>
+          </div>
+        </div>
+      </div>
         </div>
   )
 }

@@ -4,8 +4,17 @@ import { Link } from 'react-router-dom'; // Import Link from react-router-dom
 import logo from "../assets/clients/img/logo/logo.png";
 import usericon from "../assets/clients/img/icon/user.png"
 import '@fortawesome/fontawesome-free/css/all.min.css';
-
+import { useNavigate } from 'react-router-dom';
 function Header() {
+    const navigate = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.clear();
+    navigate('/register');
+    setTimeout(() => {
+      window.location.reload();
+    }, 500);
+  };
   return (
     <div>
       <header>
@@ -46,6 +55,7 @@ function Header() {
                           <li><Link to="/user/about">About us</Link></li> {/* Use Link for navigation */}    
                            <li><Link to="/user/find-user">Find User</Link></li>
                              <li><Link to="/user/follower">Folowers</Link></li>
+                             <li><Link to="/user/following">following</Link></li>
                         </ul>
                       </nav>
                     </div>
@@ -60,9 +70,9 @@ function Header() {
                           </Link>
                         </li>
                         <li>
-                        <Link to="/register">
-                            <i className="fas fa-sign-out-alt" aria-hidden="true"></i>
-                          </Link>
+                        <button onClick={handleLogout} style={{ background: 'none', border: 'none', cursor: 'pointer' }}>
+      <i className="fas fa-sign-out-alt" aria-hidden="true"></i>
+    </button>
                         </li>
                       </ul>
 

@@ -34,7 +34,7 @@ public class Feedback {
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
-    @Column(name = "like_count", nullable = false)
+    @Column(name = "like_count")
     private String likeCount;
 
     @ManyToOne(fetch = FetchType.LAZY)

@@ -6,5 +6,5 @@ import lombok.Data;
 public class UserSummaryDto {
     private Long id;
     private String username;
-    private String profilePicture;
+    private String imageBase64;
 }

@@ -10,6 +10,7 @@ import org.modelmapper.ModelMapper;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -29,8 +30,23 @@ public class SkillPosts {
     @Column(name = "title", nullable = false)
     private String title;
 
-    @Column(name = "description", columnDefinition = "TEXT", nullable = false)
-    private String description;
+    @Column(name = "summary", nullable = false)
+    private String summary;
+
+    @Column(name = "pargrhap1", columnDefinition = "TEXT", nullable = false)
+    private String pargrhap1;
+
+    @Column(name = "pargrhap2", columnDefinition = "TEXT", nullable = false)
+    private String pargrhap2;
+
+    @Column(name = "pargrhap3", columnDefinition = "TEXT", nullable = false)
+    private String pargrhap3;
+
+    @Column(name = "pargrhap4", columnDefinition = "TEXT", nullable = false)
+    private String pargrhap4;
+
+    @Column(name = "pargrhap5", columnDefinition = "TEXT", nullable = false)
+    private String pargrhap5;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
@@ -38,11 +54,12 @@ public class SkillPosts {
     @Column(name = "category", nullable = false)
     private String category;
 
-    @Column(name = "tags")
-    private String tags;
+    @Lob
+    @Column(name = "image_data", columnDefinition="LONGBLOB")
+    private byte[] imageData;
 
-    @Column(name = "image_url")
-    private String imageUrl;
+
+
 
     @OneToMany(mappedBy = "skillPost", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Feedback> feedbacks = new ArrayList<>();
@@ -76,6 +93,16 @@ public class SkillPosts {
                     }).collect(Collectors.toList());
             skillPostsDto.setLikes(likeDtos);
         }
+
+        // Convert image byte[] to Base64 string
+        if (this.imageData != null) {
+            skillPostsDto.setImageBase64(Base64.getEncoder().encodeToString(this.imageData));
+        } else {
+            skillPostsDto.setImageBase64(null);
+        }
+
+
+
         return skillPostsDto;
     }
 }

@@ -1,18 +1,17 @@
-// AppRoutes.jsx
 import React, { useEffect } from 'react';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import UserRoutes from './routes/UserRoutes';
 import UserLayout from './layouts/UserLayout';
 import Register from './views/Register';
+import ProtectedRoute from './ProtectedRoute';
 
 function AppRoutes() {
   const location = useLocation();
 
   useEffect(() => {
     const loadCSS = async () => {
-      if (location.pathname === '/login' || location.pathname === '/register') {
+      if (location.pathname === '/register') {
         await import('./assets/clients/css/register.css');
-        // await import('./assets/clients/css/login.css');
       } else if (location.pathname.startsWith('/user')) {
         await import('./assets/clients/css/bootstrap.min.css');
         await import('./assets/clients/css/owl.carousel.min.css');
@@ -34,26 +33,25 @@ function AppRoutes() {
 
   return (
     <Routes>
-   
-   <Route
-  path="/register"
-  element={<Register key={location.key} />}
-/>
+      <Route path="/register" element={<Register key={location.key} />} />
 
-
+      {/* Protected Routes */}
       {UserRoutes.map((route, index) => (
         <Route
           key={index}
           path={route.layout + route.path}
           element={
-            <UserLayout>
-              <route.component />
-            </UserLayout>
+            <ProtectedRoute allowedRoles={['USER']}>
+              <UserLayout>
+                <route.component />
+              </UserLayout>
+            </ProtectedRoute>
           }
         />
       ))}
 
-      <Route path="*" element={<Navigate to="/user/home" replace />} />
+      {/* Fallback to /register */}
+      <Route path="*" element={<Navigate to="/register" replace />} />
     </Routes>
   );
 }

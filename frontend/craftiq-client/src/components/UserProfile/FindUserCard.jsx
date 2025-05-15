@@ -1,7 +1,6 @@
 import React from 'react';
 
-
-function FindUserCard({ user }) {
+function FindUserCard({ user, onFollow }) {
   return (
     <div>
       <div className="section-top-border">
@@ -15,7 +14,12 @@ function FindUserCard({ user }) {
                   className="user-image"
                 />
                 <div className="overlay">
-                  <button className="follow-btn">Follow</button>
+                  <button
+                    className="follow-btn"
+                    onClick={() => onFollow(user.id)}
+                  >
+                    {user.isFollowing ? 'Following' : 'Follow'}
+                  </button>
                 </div>
               </div>
               <h3 className="mt-3">{user.name}</h3>

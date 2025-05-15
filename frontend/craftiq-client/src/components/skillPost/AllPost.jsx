@@ -32,7 +32,7 @@ function AllPost({ skillpost }) {
 
                             <p> {skillpost.summary} </p>
                             <ul className="blog-info-link">
-                                <li><a href="#"><i className="fa fa-user" /> {skillpost.category}</a></li>
+                                <li><a href="#"><i className="fa fa-user" /> {skillpost.username}</a></li>
                                 <li><a href="#"><i className="fa fa-comments" /> {skillpost.commentCount}</a></li>
                             </ul>
                         </div>

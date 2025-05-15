@@ -6,8 +6,10 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.extern.java.Log;
 import org.modelmapper.ModelMapper;
 
+import java.util.Base64;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -28,6 +30,18 @@ public class User {
     @Column(name = "username", nullable = false, unique = true)
     private String username;
 
+    @Column(name = "full_name", unique = false)
+    private String fullName;
+
+    @Column(name = "tp_num", unique = false)
+    private String tpNum;
+
+    @Column(name = "address", unique = false)
+    private String address;
+
+    @Column(name = "category", unique = false)
+    private String category;
+
     @Column(name = "email", nullable = false, unique = true)
     private String email;
 
@@ -42,6 +56,11 @@ public class User {
 
     @Column(name = "interests")
     private String interests;
+
+    @Lob
+    @Column(name = "image_data", columnDefinition="LONGBLOB")
+    private byte[] imageData;
+
 
     @Column(name = "role")
     private String role;
@@ -114,6 +133,13 @@ public class User {
                     .map(plan -> mapper.map(plan, LearningPlansDto.class))
                     .collect(Collectors.toSet());
             userDto.setLearningPlans(learningPlansDto);
+        }
+
+        // Convert image byte[] to Base64 string
+        if (this.imageData != null) {
+            userDto.setImageBase64(Base64.getEncoder().encodeToString(this.imageData));
+        } else {
+            userDto.setImageBase64(null);
         }
 
 
