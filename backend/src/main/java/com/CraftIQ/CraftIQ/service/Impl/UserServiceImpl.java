@@ -128,15 +128,20 @@ public class UserServiceImpl implements UserService {
             throw new NotFoundException("User not found with ID: " + id);
         }
 
-        // Retrieve the existing user from the database
         User existingUser = userRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("User not found with ID: " + id));
 
-        // Map the other fields from DTO to Entity
         User user = mapper.map(userDto, User.class);
         user.setId(id);
 
-        // Handle followers update
+        // Image handling added here
+        if (userDto.getImageBase64() != null && !userDto.getImageBase64().isEmpty()) {
+            user.setImageData(Base64.getDecoder().decode(userDto.getImageBase64()));
+        } else {
+            user.setImageData(existingUser.getImageData());
+        }
+
+        // Followers
         if (userDto.getFollowers() != null && !userDto.getFollowers().isEmpty()) {
             Set<User> followers = userDto.getFollowers().stream()
                     .map(summary -> userRepository.findById(summary.getId())
@@ -144,11 +149,10 @@ public class UserServiceImpl implements UserService {
                     .collect(Collectors.toSet());
             user.setFollowers(followers);
         } else {
-            // If no followers are provided, retain the existing ones
             user.setFollowers(existingUser.getFollowers());
         }
 
-        // Handle following update
+        // Following
         if (userDto.getFollowing() != null && !userDto.getFollowing().isEmpty()) {
             Set<User> following = userDto.getFollowing().stream()
                     .map(summary -> userRepository.findById(summary.getId())
@@ -156,23 +160,22 @@ public class UserServiceImpl implements UserService {
                     .collect(Collectors.toSet());
             user.setFollowing(following);
         } else {
-            // If no following users are provided, retain the existing ones
             user.setFollowing(existingUser.getFollowing());
         }
 
-        // Update feedbacks
+        // Feedbacks (updating on existingUser - keep as is)
         if (userDto.getFeedbacks() != null) {
             existingUser.getFeedbacks().clear();
             Set<Feedback> updatedFeedbacks = userDto.getFeedbacks().stream()
                     .map(dto -> {
                         Feedback feedback = mapper.map(dto, Feedback.class);
-                        feedback.setUser(existingUser); // maintain relationship
+                        feedback.setUser(existingUser);
                         return feedback;
                     }).collect(Collectors.toSet());
             existingUser.getFeedbacks().addAll(updatedFeedbacks);
         }
 
-        // Update skillPosts
+        // SkillPosts (updating on existingUser - keep as is)
         if (userDto.getSkillPosts() != null) {
             existingUser.getSkillPosts().clear();
             Set<SkillPosts> updatedPosts = userDto.getSkillPosts().stream()
@@ -184,13 +187,11 @@ public class UserServiceImpl implements UserService {
             existingUser.getSkillPosts().addAll(updatedPosts);
         }
 
-
-        // Save the updated user entity
         User savedUser = userRepository.save(user);
 
-        // Use custom toDto() to ensure correct follower/following mapping
         return savedUser.toDto(mapper);
     }
+
 
     // Delete User by ID
     @Override

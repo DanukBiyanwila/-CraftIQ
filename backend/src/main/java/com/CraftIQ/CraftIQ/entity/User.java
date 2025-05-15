@@ -30,6 +30,18 @@ public class User {
     @Column(name = "username", nullable = false, unique = true)
     private String username;
 
+    @Column(name = "full_name", unique = false)
+    private String fullName;
+
+    @Column(name = "tp_num", unique = false)
+    private String tpNum;
+
+    @Column(name = "address", unique = false)
+    private String address;
+
+    @Column(name = "category", unique = false)
+    private String category;
+
     @Column(name = "email", nullable = false, unique = true)
     private String email;
 

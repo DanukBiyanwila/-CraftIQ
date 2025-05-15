@@ -4,6 +4,7 @@ import com.CraftIQ.CraftIQ.entity.Feedback;
 import com.CraftIQ.CraftIQ.entity.LearningPlans;
 import com.CraftIQ.CraftIQ.entity.SkillPosts;
 import com.CraftIQ.CraftIQ.entity.User;
+import jakarta.persistence.Column;
 import lombok.Data;
 import org.modelmapper.ModelMapper;
 
@@ -16,11 +17,17 @@ import java.util.stream.Collectors;
 public class UserDto {
     private Long id;
     private String username;
+    private String fullName;
+    private String tpNum;
+    private String address;
+    private String category;
     private String email;
     private String password;
     private String bio;
     private String profilePicture;
     private String interests;
+
+
 
     private String imageBase64;
 
