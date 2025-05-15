@@ -1,7 +1,5 @@
-import React from "react";
 import { useParams } from "react-router-dom";
 import EditLearningPlancomponent from "../components/learningPlane/EditLearningPlan"; // adjust path if needed
-import LearningPlaneData from "../data/LearningPlaneData"; // your data file
 import { useEffect, useState } from "react";
 
 function EditLearningPlane() {

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
-
+import Swal from "sweetalert2";
 function EditLearningPlan() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -82,15 +82,27 @@ function EditLearningPlan() {
       weeks: updatedWeekStrings,
       milestones: updatedMilestones,
     };
+try {
+  await axios.put(`http://localhost:8086/api/learningPlans/${id}`, updatedPlan);
 
-    try {
-      await axios.put(`http://localhost:8086/api/learningPlans/${id}`, updatedPlan);
-      alert("Learning Plan updated successfully!");
-      navigate("/user/learning-plane");
-    } catch (err) {
-      console.error("Failed to update plan:", err);
-      alert("Failed to update the learning plan.");
-    }
+  Swal.fire({
+    icon: "success",
+    title: "Updated!",
+    text: "Learning Plan updated successfully!",
+    confirmButtonColor: "#3085d6"
+  });
+
+  navigate("/user/learning-plane");
+} catch (err) {
+  console.error("Failed to update plan:", err);
+
+  Swal.fire({
+    icon: "error",
+    title: "Update Failed",
+    text: "Failed to update the learning plan.",
+    confirmButtonColor: "#d33"
+  });
+}
   };
 
   if (!learningPlan) return <p>Loading...</p>;
