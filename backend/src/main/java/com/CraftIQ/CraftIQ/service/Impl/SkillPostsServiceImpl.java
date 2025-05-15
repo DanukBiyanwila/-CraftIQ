@@ -11,9 +11,12 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -28,10 +31,15 @@ public class SkillPostsServiceImpl implements SkillPostsService {
     // Create SkillPost
     @Override
     @Transactional
-    public SkillPostsDto postSkillPost(SkillPostsDto skillPostsDto) {
+    public SkillPostsDto postSkillPost(SkillPostsDto skillPostsDto , MultipartFile image) throws IOException {
         // Convert DTO to Entity
         SkillPosts skillPost = new SkillPosts();
         mapper.map(skillPostsDto, skillPost);
+
+        // Handle Image Upload
+        if (image != null && !image.isEmpty()) {
+            skillPost.setImageData(image.getBytes());
+        }
 
         // Ensure 'createdAt' is set to the current time if it is not already set in the DTO
         if (skillPost.getCreatedAt() == null) {
@@ -60,8 +68,15 @@ public class SkillPostsServiceImpl implements SkillPostsService {
         // Save the SkillPost (with cascade, feedbacks, and user will also be saved)
         SkillPosts savedSkillPost = skillPostsRepository.save(skillPost);
 
+
+        SkillPostsDto savedDto = savedSkillPost.toDto(mapper);
+
+        if (savedSkillPost.getImageData() != null) {
+            savedDto.setImageBase64(Base64.getEncoder().encodeToString(savedSkillPost.getImageData()));
+        }
+
         // Convert and return DTO
-        return savedSkillPost.toDto(mapper);
+        return savedDto;
     }
 
     // Get all SkillPosts
@@ -96,13 +111,17 @@ public class SkillPostsServiceImpl implements SkillPostsService {
                 .orElseThrow(() -> new NotFoundException("SkillPost not found with ID: " + id));
 
         existingSkillPost.setTitle(skillPostsDto.getTitle());
-        existingSkillPost.setDescription(skillPostsDto.getDescription());
+        existingSkillPost.setPargrhap1(skillPostsDto.getPargrhap1());
+        existingSkillPost.setPargrhap2(skillPostsDto.getPargrhap2());
+        existingSkillPost.setPargrhap3(skillPostsDto.getPargrhap3());
+        existingSkillPost.setPargrhap4(skillPostsDto.getPargrhap4());
+        existingSkillPost.setPargrhap5(skillPostsDto.getPargrhap5());
+        existingSkillPost.setSummary(skillPostsDto.getSummary());
         if (skillPostsDto.getCreatedAt() != null) {
             existingSkillPost.setCreatedAt(skillPostsDto.getCreatedAt());
         }
         existingSkillPost.setCategory(skillPostsDto.getCategory());
-        existingSkillPost.setTags(skillPostsDto.getTags());
-        existingSkillPost.setImageUrl(skillPostsDto.getImageUrl());
+
 
         // Optional: update user if applicable
         if (skillPostsDto.getUser() != null) {

@@ -1,53 +1,43 @@
-import React from 'react'
-
-import { Link, useParams } from 'react-router-dom'
-import SkillPostData from '../data/SkillPostData'
-import UpdatePost from '../components/skillPost/UpdatePost'
+import React, { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
+import axios from 'axios';
+import UpdatePost from '../components/skillPost/UpdatePost';
 
 function SkillPostEdit() {
-    const { id } = useParams();
-  const postId = parseInt(id, 10); // Make sure it's a number
-  const skillPost = SkillPostData.find(post => post.id === postId);
+  const { id } = useParams();
+  const [skillPost, setSkillPost] = useState(null);
+
+  useEffect(() => {
+    axios.get(`http://localhost:8086/api/skillposts/${id}`)
+      .then(response => {
+        const post = response.data;
+        setSkillPost({
+          ...post,
+          img: post.imageBase64 ? `data:image/jpeg;base64,${post.imageBase64}` : '',
+        });
+      })
+      .catch(error => {
+        console.error('Failed to fetch post:', error);
+      });
+  }, [id]);
 
   if (!skillPost) {
-    return <div className="text-center mt-5">Post not found</div>;
+    return <div className="text-center mt-5">Loading post...</div>;
   }
+
   return (
     <div>
-        <section className="blog_area single-post-area section-padding">
-                <div className="container">
-                    <div className="row">
-                        <div className="col-lg-12 posts-list">
-                        <UpdatePost skillPost={skillPost} />
-                            <div className="d-flex justify-content-center">
-                                <Link to="/user/user-edit" className="btn btn-info mt-3">
-                                    Update
-                                </Link>
-                            </div>
-                        </div>
-                        {/* <div className="col-lg-4">
-                            <div>
-                                <div className="blog_right_sidebar">
-                                    <aside className="single_sidebar_widget popular_post_widget">
-                                        <h3 className="widget_title">Your Post</h3>
-                                        {SkillPostData.slice(0, 4).map(skillPost => (
-                                            <PostSIdeSingle key={skillPost.id} skillPost={skillPost} />
-                                        ))}
-                                        <div className="pt-5">
-                                            <Link to="/user/viewSkillPost" className="button rounded-0 primary-bg text-white w-100 btn_1 boxed-btn mt-8">
-                                                View More
-                                            </Link>
-                                        </div>
-                                    </aside>
-                                </div>
-                            </div>
-                        </div> */}
-
-                    </div>
-                </div>
-            </section>
+      <section className="blog_area single-post-area section-padding">
+        <div className="container">
+          <div className="row">
+            <div className="col-lg-12 posts-list">
+              <UpdatePost skillPost={skillPost} />
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
-  )
+  );
 }
 
-export default SkillPostEdit
+export default SkillPostEdit;
