@@ -54,6 +54,32 @@ function LearningPlane() {
     fetchPlans();
   }, []);
 
+  const handleDelete = async (planId) => {
+  try {
+    const response = await fetch(`http://localhost:8086/api/learningPlans/${planId}`, {
+      method: "DELETE",
+    });
+
+    if (!response.ok) throw new Error("Delete failed");
+
+    Swal.fire({
+      icon: "success",
+      title: "Deleted!",
+      text: "Learning Plan has been deleted.",
+    });
+
+    setLearningPlans(prev => prev.filter(plan => plan.id !== planId));
+  } catch (err) {
+    console.error("Delete error:", err);
+    Swal.fire({
+      icon: "error",
+      title: "Delete Failed",
+      text: "Could not delete the learning plan.",
+    });
+  }
+};
+
+
   return (
     <div>
       <button className="btn btn-primary mt-40 ml-10" onClick={() => navigate('/user/plane-create')}>
@@ -62,7 +88,7 @@ function LearningPlane() {
 
       {learningPlans.length > 0 ? (
         learningPlans.map(plan => (
-          <LearningPlaneCard key={plan.id} LearningPlane={plan} />
+          <LearningPlaneCard key={plan.id} LearningPlane={plan} onDelete={handleDelete} />
         ))
       ) : (
         <p className="text-center mt-4">No Learning Plans found.</p>

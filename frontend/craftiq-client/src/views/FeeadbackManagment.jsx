@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import Swal from 'sweetalert2';
 
 
 function FeeadbackManagment() {
@@ -8,7 +9,7 @@ function FeeadbackManagment() {
 
   const [editingId, setEditingId] = useState(null);
   const [editedFeedback, setEditedFeedback] = useState({});
-    // Get logged-in user from localStorage
+  // Get logged-in user from localStorage
   const loggedInUser = JSON.parse(localStorage.getItem('user'));
   const loggedInUserId = loggedInUser?.id;
 
@@ -18,34 +19,34 @@ function FeeadbackManagment() {
     setEditedFeedback((prev) => ({ ...prev, [id]: currentText }));
   };
 
- const handleSaveClick = async (id) => {
-  const updatedComment = editedFeedback[id];
+  const handleSaveClick = async (id) => {
+    const updatedComment = editedFeedback[id];
 
-  try {
-    await axios.put(`http://localhost:8086/api/feedback/${id}`, {
-      comment: updatedComment
-    });
+    try {
+      await axios.put(`http://localhost:8086/api/feedback/${id}`, {
+        comment: updatedComment
+      });
 
-    // Update local state to reflect saved comment
-    setUserComments(prevComments =>
-      prevComments.map(c =>
-        c.id === id ? { ...c, comment: updatedComment } : c
-      )
-    );
+      // Update local state to reflect saved comment
+      setUserComments(prevComments =>
+        prevComments.map(c =>
+          c.id === id ? { ...c, comment: updatedComment } : c
+        )
+      );
 
-    setEditingId(null);
-  } catch (error) {
-    console.error("Failed to update feedback", error);
-    alert("Error updating feedback. Please try again.");
-  }
-};
+      setEditingId(null);
+    } catch (error) {
+      console.error("Failed to update feedback", error);
+      alert("Error updating feedback. Please try again.");
+    }
+  };
 
 
   const handleChange = (e, id) => {
     setEditedFeedback((prev) => ({ ...prev, [id]: e.target.value }));
   };
 
-    const [userComments, setUserComments] = useState([]);
+  const [userComments, setUserComments] = useState([]);
   const [loading, setLoading] = useState(true);
 
 
@@ -101,6 +102,42 @@ function FeeadbackManagment() {
       });
   }, [loggedInUserId]);
 
+  const handleDeleteClick = async (id) => {
+  const confirmed = await Swal.fire({
+    title: 'Are you sure?',
+    text: 'You will not be able to recover this feedback!',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#d33',
+    cancelButtonColor: '#3085d6',
+    confirmButtonText: 'Yes, delete it!'
+  });
+
+  if (confirmed.isConfirmed) {
+    try {
+      await axios.delete(`http://localhost:8086/api/feedback/${id}`);
+      setUserComments(prev => prev.filter(comment => comment.id !== id));
+
+      Swal.fire({
+        title: 'Deleted!',
+        text: 'Your feedback has been deleted.',
+        icon: 'success',
+        timer: 1500,
+        showConfirmButton: false
+      });
+    } catch (error) {
+      console.error("Error deleting feedback:", error);
+      Swal.fire({
+        title: 'Error!',
+        text: 'Failed to delete feedback.',
+        icon: 'error',
+        confirmButtonText: 'OK'
+      });
+    }
+  }
+};
+
+
 
 
 
@@ -109,7 +146,7 @@ function FeeadbackManagment() {
   if (!loggedInUserId) return <p>Please login to see your feedback.</p>;
 
 
-  
+
   return (
     <div className="whole-wrap">
       <div className="container box_1170">
@@ -118,7 +155,7 @@ function FeeadbackManagment() {
 
 
 
-         <div className="row">
+          <div className="row">
             {userComments.map(comment => (
               <div className="col-lg-12 mb-5" key={comment.id}>
                 <div className="d-flex align-items-center mb-4">
@@ -137,7 +174,7 @@ function FeeadbackManagment() {
                     <strong>{comment.author}</strong><br />
                     <small>{comment.date}</small>
                   </div>
-                </div>    
+                </div>
                 <h5>{comment.postTitle}</h5>
 
                 {editingId === comment.id ? (
@@ -162,16 +199,19 @@ function FeeadbackManagment() {
                     Save
                   </button>
                 ) : (
-                 <button
-  className="btn btn-primary mr-2"
-  onClick={() => handleEditClick(comment.id, comment.comment)}  
->
-  Edit
-</button>
+                  <button
+                    className="btn btn-primary mr-2"
+                    onClick={() => handleEditClick(comment.id, comment.comment)}
+                  >
+                    Edit
+                  </button>
 
                 )}
 
-                <button className="btn btn-danger">Delete</button>
+             <button className="btn btn-danger" onClick={() => handleDeleteClick(comment.id)}>
+  Delete
+</button>
+
               </div>
             ))}
           </div>
