@@ -32,14 +32,12 @@ public class LearningPlans {
     @Column(name = "description", columnDefinition = "TEXT")
     private String description;
 
-    @Column(name = "start_date", nullable = false)
-    private java.time.LocalDate startDate;
+    @ElementCollection
+    @CollectionTable(name = "learning_plan_weeks", joinColumns = @JoinColumn(name = "learning_plan_id"))
+    @Column(name = "week")
+    private List<String> weeks = new ArrayList<>();
 
-    @Column(name = "end_date", nullable = false)
-    private java.time.LocalDate endDate;
 
-    @Column(name = "author", nullable = false)
-    private String author;
 
     @Column(name = "status", nullable = false)
     private String status;
@@ -65,6 +63,8 @@ public class LearningPlans {
                     .collect(Collectors.toList());
             dto.setMilestones(milestoneDtos);
         }
+
+        dto.setWeeks(this.weeks);
 
 
         return dto;

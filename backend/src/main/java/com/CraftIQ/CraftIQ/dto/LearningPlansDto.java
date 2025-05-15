@@ -14,14 +14,14 @@ public class LearningPlansDto {
     private Long id;
     private String title;
     private String description;
-    private java.time.LocalDate startDate;
-    private java.time.LocalDate endDate;
-    private String author;
+
     private String status;
 
     private Long userId;
 
     private List<MilestoneDto> milestones;
+
+    private List<String> weeks;
 
     // Convert DTO to Entity
     public LearningPlans toEntity(ModelMapper mapper) {
@@ -42,6 +42,8 @@ public class LearningPlansDto {
                     }).collect(Collectors.toList());
             plan.setMilestones(milestoneEntities);
         }
+
+        plan.setWeeks(this.weeks);
 
         return plan;
     }

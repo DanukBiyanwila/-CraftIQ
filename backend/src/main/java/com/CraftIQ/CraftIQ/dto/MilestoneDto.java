@@ -9,7 +9,8 @@ import org.modelmapper.ModelMapper;
 public class MilestoneDto {
 
     private Long id;
-    private String name;
+    private String title;
+    private String date;
     private boolean completed;
 
     public Milestone toEntity(ModelMapper mapper) {
