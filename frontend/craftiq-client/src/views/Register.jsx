@@ -35,21 +35,23 @@ function Register() {
     setMode((prev) => (prev === 'sign-in' ? 'sign-up' : 'sign-in'));
   };
 
-    const [formData, setFormData] = useState({
-    username: '',
-    email: '',
-    password: '',
-    confirmPassword: ''
-    // profilePic: null
-  });
+   const [formData, setFormData] = useState({
+  username: '',
+  email: '',
+  password: '',
+  confirmPassword: '',
+  image: null    // rename here
+});
 
-  const handleChange = (e) => {
-    const { name, value, files } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: files ? files[0] : value
-    }));
-  };
+
+const handleChange = (e) => {
+  const { name, value, files } = e.target;
+  setFormData(prev => ({
+    ...prev,
+    [name]: files ? files[0] : value
+  }));
+};
+
 
 const handleSubmit = async (e) => {
   e.preventDefault();
@@ -58,26 +60,55 @@ const handleSubmit = async (e) => {
     return Swal.fire('Error', 'Passwords do not match', 'error');
   }
 
-  // Prepare JSON payload
-  const data = {
+  // Prepare JSON part of the form
+  const userJson = {
     username: formData.username,
     email: formData.email,
     password: formData.password,
-    // profilePicture: formData.profilePic // This should be a string URL
   };
 
+  const multipartData = new FormData();
+  multipartData.append('user', new Blob([JSON.stringify(userJson)], { type: 'application/json' }));
+
+  if (formData.image) {
+    multipartData.append('image', formData.image);
+  }
+
   try {
-    const response = await axios.post('http://localhost:8086/api/user/create', data, {
-      headers: {
-        'Content-Type': 'application/json'
-      }
+    const response = await fetch('http://localhost:8086/api/user/create', {
+      method: 'POST',
+      body: multipartData,  // FormData as body
+      // **No Content-Type header! Let browser set it automatically including boundary**
     });
 
+    if (!response.ok) {
+      // Try to parse error message from backend if JSON
+      let errorMessage = 'Registration failed!';
+      try {
+        const errorData = await response.json();
+        errorMessage = errorData.message || errorMessage;
+      } catch {
+        // ignore JSON parse errors
+      }
+      throw new Error(errorMessage);
+    }
+
     Swal.fire('Success', 'Account created successfully!', 'success');
+
+    // Optional: reset form fields
+    setFormData({
+      username: '',
+      email: '',
+      password: '',
+      confirmPassword: '',
+      image: null,
+    });
+
   } catch (error) {
-    Swal.fire('Error', error.response?.data?.message || 'Registration failed!', 'error');
+    Swal.fire('Error', error.message, 'error');
   }
 };
+
 
 
 const handleLogin = async (e) => {
@@ -109,7 +140,7 @@ const handleLogin = async (e) => {
     Swal.fire('Welcome', 'Login successful!', 'success').then(() => {
   navigate('/user/home');
 
-  // Refresh after 1 second
+  // Refresh after 0.5 second
   setTimeout(() => {
     window.location.reload();
   }, 500);
@@ -143,7 +174,7 @@ const handleLogin = async (e) => {
       </div>
       <div className="input-group">
         <i className="bx bxs-profile" />
-        <input type="file" name="profilePic" onChange={handleChange} accept="image/*" required />
+        <input type="file" name="image" onChange={handleChange} accept="image/*" required />
       </div>
       <div className="input-group">
         <i className="bx bxs-lock-alt" />

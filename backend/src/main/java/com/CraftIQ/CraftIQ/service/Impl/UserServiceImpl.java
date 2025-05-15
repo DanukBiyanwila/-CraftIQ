@@ -13,11 +13,10 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.io.IOException;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -29,9 +28,15 @@ public class UserServiceImpl implements UserService {
 
     // Create User
     @Override
-    public UserDto createUser(UserDto userDto) {
+    public UserDto createUser(UserDto userDto , MultipartFile image) throws IOException {
         // 1. Convert DTO to Entity
         User user = mapper.map(userDto, User.class);
+
+        // Handle Image Upload
+        if (image != null && !image.isEmpty()) {
+            user.setImageData(image.getBytes());
+        }
+
 
         // 2. Handle followers
         if (userDto.getFollowers() != null && !userDto.getFollowers().isEmpty()) {
@@ -80,7 +85,14 @@ public class UserServiceImpl implements UserService {
         User savedUser = userRepository.save(user);
 
         // 6. Return DTO
-        return savedUser.toDto(mapper);
+        UserDto savedDto = savedUser.toDto(mapper);
+
+        if (savedUser.getImageData() != null) {
+            savedDto.setImageBase64(Base64.getEncoder().encodeToString(savedUser.getImageData()));
+        }
+
+        return savedDto;
+
     }
 
 
@@ -93,18 +105,16 @@ public class UserServiceImpl implements UserService {
             return new ArrayList<>();
         } else {
             return users.stream()
-                    .map(user -> user.toDto(mapper)) // Make sure to call the toDto method here
+                    .map(user -> user.toDto(mapper))  // this calls toDto including image conversion
                     .collect(Collectors.toList());
         }
     }
 
-
-    // Get User by ID
     @Override
     public UserDto getUserById(Long id) {
         Optional<User> user = userRepository.findById(id);
         if (user.isPresent()) {
-            return user.get().toDto(mapper); // Use the same custom DTO mapping
+            return user.get().toDto(mapper);  // this calls toDto including image conversion
         } else {
             throw new NotFoundException("User not found with ID: " + id);
         }

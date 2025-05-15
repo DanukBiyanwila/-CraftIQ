@@ -7,6 +7,7 @@ import com.CraftIQ.CraftIQ.entity.User;
 import lombok.Data;
 import org.modelmapper.ModelMapper;
 
+import java.util.Base64;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -20,6 +21,8 @@ public class UserDto {
     private String bio;
     private String profilePicture;
     private String interests;
+
+    private String imageBase64;
 
     private Set<UserSummaryDto> followers = new HashSet<>();
     private Set<UserSummaryDto> following = new HashSet<>();
@@ -66,6 +69,10 @@ public class UserDto {
             }).collect(Collectors.toSet());
 
             user.setLearningPlans(learningPlanEntities);
+        }
+
+        if (this.imageBase64 != null) {
+            user.setImageData(Base64.getDecoder().decode(this.imageBase64));
         }
 
 
