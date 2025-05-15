@@ -15,7 +15,7 @@ function SkillPostSingle( {skillPost, author } ) {
                       <h2> {skillPost.title}
                       </h2>
                       <ul className="blog-info-link mt-3 mb-4">
-                        <li><a href="#"><i className="fa fa-user" /> {author.fullName}</a></li>
+                        <li><a href="#"><i className="fa fa-user" /> {author?.fullName || "Unknown Author"}</a></li>
                         <li><a href="#"><i className="fa fa-comments" /> {skillPost.commentCount}</a></li>
                       </ul>
                       <p className="excert">
@@ -58,7 +58,7 @@ function SkillPostSingle( {skillPost, author } ) {
           {author?.profileImage && (
             <img
               src={author.profileImage}
-              alt={author.fullName}
+              alt={author?.fullName || "Unknown Author"}
               style={{ width: "70px", height: "70px", borderRadius: "50%" }}
             />
           )}
