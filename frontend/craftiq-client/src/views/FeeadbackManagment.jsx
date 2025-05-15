@@ -18,10 +18,28 @@ function FeeadbackManagment() {
     setEditedFeedback((prev) => ({ ...prev, [id]: currentText }));
   };
 
-  const handleSaveClick = (id) => {
-    // Save logic here if you want to persist to a backend
+ const handleSaveClick = async (id) => {
+  const updatedComment = editedFeedback[id];
+
+  try {
+    await axios.put(`http://localhost:8086/api/feedback/${id}`, {
+      comment: updatedComment
+    });
+
+    // Update local state to reflect saved comment
+    setUserComments(prevComments =>
+      prevComments.map(c =>
+        c.id === id ? { ...c, comment: updatedComment } : c
+      )
+    );
+
     setEditingId(null);
-  };
+  } catch (error) {
+    console.error("Failed to update feedback", error);
+    alert("Error updating feedback. Please try again.");
+  }
+};
+
 
   const handleChange = (e, id) => {
     setEditedFeedback((prev) => ({ ...prev, [id]: e.target.value }));
@@ -83,11 +101,15 @@ function FeeadbackManagment() {
       });
   }, [loggedInUserId]);
 
+
+
+
   if (loading) return <p>Loading feedback...</p>;
 
   if (!loggedInUserId) return <p>Please login to see your feedback.</p>;
 
 
+  
   return (
     <div className="whole-wrap">
       <div className="container box_1170">
@@ -140,12 +162,13 @@ function FeeadbackManagment() {
                     Save
                   </button>
                 ) : (
-                  <button
-                    className="btn btn-primary mr-2"
-                    onClick={() => handleEditClick(comment.id, comment.pargrhap)}
-                  >
-                    Edit
-                  </button>
+                 <button
+  className="btn btn-primary mr-2"
+  onClick={() => handleEditClick(comment.id, comment.comment)}  
+>
+  Edit
+</button>
+
                 )}
 
                 <button className="btn btn-danger">Delete</button>
