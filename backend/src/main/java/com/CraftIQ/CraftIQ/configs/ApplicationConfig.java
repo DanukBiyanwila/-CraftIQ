@@ -24,7 +24,17 @@ public class ApplicationConfig {
             mapper.skip(UserDto::setFollowing);
             mapper.skip(UserDto::setFeedbacks);
             mapper.skip(UserDto::setSkillPosts);
+            mapper.skip(UserDto::setLearningPlans);
         });
+
+        modelMapper.typeMap(UserDto.class, User.class)
+                .addMappings(mapper -> mapper.skip(User::setFeedbacks));
+        modelMapper.typeMap(UserDto.class, User.class)
+                .addMappings(mapper -> mapper.skip(User::setLearningPlans));
+        modelMapper.typeMap(UserDto.class, User.class)
+                .addMappings(mapper -> mapper.skip(User::setSkillPosts));
+
+
 
         return modelMapper;
     }

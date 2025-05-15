@@ -1,5 +1,6 @@
 package com.CraftIQ.CraftIQ.service.Impl;
 
+import com.CraftIQ.CraftIQ.dto.FeedbackDto;
 import com.CraftIQ.CraftIQ.dto.LoginRequestDto;
 import com.CraftIQ.CraftIQ.dto.LoginResponseDto;
 import com.CraftIQ.CraftIQ.dto.UserDto;
@@ -7,6 +8,7 @@ import com.CraftIQ.CraftIQ.entity.Feedback;
 import com.CraftIQ.CraftIQ.entity.SkillPosts;
 import com.CraftIQ.CraftIQ.entity.User;
 import com.CraftIQ.CraftIQ.exception.NotFoundException;
+import com.CraftIQ.CraftIQ.repository.FeedbackRepository;
 import com.CraftIQ.CraftIQ.repository.UserRepository;
 import com.CraftIQ.CraftIQ.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +26,7 @@ import java.util.stream.Collectors;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final FeedbackRepository feedbackRepository;
     private final ModelMapper mapper;
 
     // Create User
@@ -124,58 +127,70 @@ public class UserServiceImpl implements UserService {
     // Update User by ID
     @Override
     public UserDto updateUser(Long id, UserDto userDto) {
-        if (!userRepository.existsById(id)) {
-            throw new NotFoundException("User not found with ID: " + id);
-        }
-
         User existingUser = userRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("User not found with ID: " + id));
 
-        User user = mapper.map(userDto, User.class);
-        user.setId(id);
+        // Map basic fields, but skip collections like feedbacks if mapper is configured that way
+        mapper.map(userDto, existingUser);
 
-        // Image handling added here
         if (userDto.getImageBase64() != null && !userDto.getImageBase64().isEmpty()) {
-            user.setImageData(Base64.getDecoder().decode(userDto.getImageBase64()));
-        } else {
-            user.setImageData(existingUser.getImageData());
+            existingUser.setImageData(Base64.getDecoder().decode(userDto.getImageBase64()));
         }
 
-        // Followers
-        if (userDto.getFollowers() != null && !userDto.getFollowers().isEmpty()) {
+        if (userDto.getFollowers() != null) {
             Set<User> followers = userDto.getFollowers().stream()
                     .map(summary -> userRepository.findById(summary.getId())
                             .orElseThrow(() -> new RuntimeException("Follower not found with ID: " + summary.getId())))
                     .collect(Collectors.toSet());
-            user.setFollowers(followers);
-        } else {
-            user.setFollowers(existingUser.getFollowers());
+            existingUser.setFollowers(followers);
         }
 
-        // Following
-        if (userDto.getFollowing() != null && !userDto.getFollowing().isEmpty()) {
+        if (userDto.getFollowing() != null) {
             Set<User> following = userDto.getFollowing().stream()
                     .map(summary -> userRepository.findById(summary.getId())
                             .orElseThrow(() -> new RuntimeException("Following user not found with ID: " + summary.getId())))
                     .collect(Collectors.toSet());
-            user.setFollowing(following);
-        } else {
-            user.setFollowing(existingUser.getFollowing());
+            existingUser.setFollowing(following);
         }
 
-        // Feedbacks (updating on existingUser - keep as is)
         if (userDto.getFeedbacks() != null) {
-            existingUser.getFeedbacks().clear();
-            Set<Feedback> updatedFeedbacks = userDto.getFeedbacks().stream()
-                    .map(dto -> {
-                        Feedback feedback = mapper.map(dto, Feedback.class);
-                        feedback.setUser(existingUser);
-                        return feedback;
-                    }).collect(Collectors.toSet());
-            existingUser.getFeedbacks().addAll(updatedFeedbacks);
+            Set<Feedback> existingFeedbacks = existingUser.getFeedbacks();
+
+            // Create a map of existing feedbacks for fast lookup
+            Map<Long, Feedback> existingFeedbackMap = existingFeedbacks.stream()
+                    .filter(f -> f.getId() != null)
+                    .collect(Collectors.toMap(Feedback::getId, f -> f));
+
+            // Prepare updated set
+            Set<Feedback> updatedFeedbacks = new HashSet<>();
+
+            for (FeedbackDto dto : userDto.getFeedbacks()) {
+                Feedback feedback;
+                if (dto.getId() != null && existingFeedbackMap.containsKey(dto.getId())) {
+                    feedback = existingFeedbackMap.get(dto.getId());
+                    mapper.map(dto, feedback);
+                } else if (dto.getId() != null) {
+                    // fetch from DB if it's not in current collection
+                    feedback = feedbackRepository.findById(dto.getId()).orElse(null);
+                    if (feedback == null) {
+                        feedback = mapper.map(dto, Feedback.class);
+                    } else {
+                        mapper.map(dto, feedback);
+                    }
+                } else {
+                    feedback = mapper.map(dto, Feedback.class);
+                }
+
+                feedback.setUser(existingUser);
+                updatedFeedbacks.add(feedback);
+            }
+
+            // Now clear and repopulate the existing collection WITHOUT reassigning the set object
+            existingFeedbacks.clear();
+            existingFeedbacks.addAll(updatedFeedbacks);
         }
 
-        // SkillPosts (updating on existingUser - keep as is)
+
         if (userDto.getSkillPosts() != null) {
             existingUser.getSkillPosts().clear();
             Set<SkillPosts> updatedPosts = userDto.getSkillPosts().stream()
@@ -187,10 +202,9 @@ public class UserServiceImpl implements UserService {
             existingUser.getSkillPosts().addAll(updatedPosts);
         }
 
-        User savedUser = userRepository.save(user);
-
-        return savedUser.toDto(mapper);
+        return userRepository.save(existingUser).toDto(mapper);
     }
+
 
 
     // Delete User by ID
