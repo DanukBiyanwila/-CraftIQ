@@ -1,11 +1,17 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 
-function LearningPlaneCard({ LearningPlane }) {
+function LearningPlaneCard({ LearningPlane, onDelete }) {
   const navigate = useNavigate();
 
   const handleEdit = () => {
     navigate(`/user/edit-learning-plane/${LearningPlane.id}`);
+  };
+
+  const handleDelete = () => {
+    if (window.confirm("Are you sure you want to delete this learning plan?")) {
+      onDelete(LearningPlane.id);
+    }
   };
 
   return (
@@ -14,18 +20,18 @@ function LearningPlaneCard({ LearningPlane }) {
         <div className="w-95 w-md-75 w-lg-60 w-xl-55 mx-auto mb-6 text-center">
           <h2 className="display-18 display-md-16 display-lg-14 mb-10">
             {LearningPlane.title}
-            <span
-              className="text-primary ml-60 cursor-pointer"
+            <button
               onClick={handleEdit}
+              className="ml-3 btn btn-sm btn-outline-primary"
             >
               Edit
-            </span>
-             <span
-              className="text-primary ml-60 cursor-pointer"
-              onClick={handleEdit}
+            </button>
+            <button
+              onClick={handleDelete}
+              className="ml-2 btn btn-sm btn-outline-danger"
             >
               Delete
-            </span>
+            </button>
           </h2>
         </div>
 
