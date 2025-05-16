@@ -1,9 +1,3 @@
-import React from 'react'
-
-import singleblog1 from "../../assets/clients/img/blog/single_blog_1.png"
-import author from "../../assets/clients/img/blog/author.png"
-import next from "../../assets/clients/img/post/next.png"
-import preview from "../../assets/clients/img/post/preview.png"
 function SkillPostSingle( {skillPost, author } ) {
   return (
       <div>
