@@ -10,6 +10,9 @@ function UserDetails() {
 
   const localUserData = JSON.parse(localStorage.getItem('user'));
   const userId = localUserData?.id || localUserData?.userId;
+const token = localUserData?.token;
+
+
 
   useEffect(() => {
     if (!userId) {
@@ -18,17 +21,22 @@ function UserDetails() {
       return;
     }
 
-    const fetchUserData = async () => {
-      try {
-        setLoading(true);
-        const response = await axios.get(`http://localhost:8086/api/user/${userId}`);
-        setUser(response.data);
-      } catch (err) {
-        setError('Failed to fetch user data.');
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchUserData = async () => {
+  try {
+    setLoading(true);
+    const response = await axios.get(`http://localhost:8086/api/user/${userId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    setUser(response.data);
+  } catch (err) {
+    setError('Failed to fetch user data.');
+  } finally {
+    setLoading(false);
+  }
+};
+
 
     fetchUserData();
   }, [userId]);
@@ -38,7 +46,11 @@ const handleDelete = async () => {
   if (!confirmed) return;
 
   try {
-    await axios.delete(`http://localhost:8086/api/user/${userId}`);
+    await axios.delete(`http://localhost:8086/api/user/${userId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
     localStorage.clear();
     window.location.href = "/register"; 
   } catch (err) {

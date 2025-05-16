@@ -8,11 +8,16 @@ function FindUser() {
   const [currentUser, setCurrentUser] = useState(null);
 
  const loggedInUser = useMemo(() => JSON.parse(localStorage.getItem('user')), []);
+ const token = JSON.parse(localStorage.getItem("user"))?.token;
 
 useEffect(() => {
   if (!loggedInUser?.id) return;
 
-  axios.get('http://localhost:8086/api/user/')
+  axios.get('http://localhost:8086/api/user/', {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  })
     .then(res => {
       const allUsers = res.data;
       const current = allUsers.find(u => u.id === loggedInUser.id);
@@ -34,15 +39,19 @@ useEffect(() => {
     .catch(err => {
       console.error('Error fetching users:', err);
     });
-}, []); 
+}, []);
 
 
-  const handleFollow = async (targetUserId) => {
+const handleFollow = async (targetUserId) => {
   if (!currentUser) return;
 
   try {
     // 1. Get the target user from API
-    const targetUserRes = await axios.get(`http://localhost:8086/api/user/${targetUserId}`);
+    const targetUserRes = await axios.get(`http://localhost:8086/api/user/${targetUserId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
     const targetUser = targetUserRes.data;
 
     // 2. Update logged-in user's following list
@@ -50,6 +59,10 @@ useEffect(() => {
     await axios.put(`http://localhost:8086/api/user/${currentUser.id}`, {
       ...currentUser,
       following: updatedFollowing
+    }, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
     });
 
     // 3. Update target user's followers list
@@ -57,6 +70,10 @@ useEffect(() => {
     await axios.put(`http://localhost:8086/api/user/${targetUserId}`, {
       ...targetUser,
       followers: updatedFollowers
+    }, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
     });
 
     // 4. UI feedback and local update
@@ -90,6 +107,7 @@ useEffect(() => {
     });
   }
 };
+
 
 
   return (

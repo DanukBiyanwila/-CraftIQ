@@ -12,7 +12,7 @@ import java.util.List;
 @RestController
 @RequestMapping("api/learningPlans")
 @RequiredArgsConstructor
-@CrossOrigin
+@CrossOrigin(origins = "http://localhost:3000")
 public class LearningPlansController {
 
     private final LearningPlansServiceImpl learningPlansService;

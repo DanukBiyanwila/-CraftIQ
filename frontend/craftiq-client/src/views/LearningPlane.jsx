@@ -6,58 +6,66 @@ import Swal from "sweetalert2";
 function LearningPlane() {
   const [learningPlans, setLearningPlans] = useState([]);
   const navigate = useNavigate();
+const token = JSON.parse(localStorage.getItem("user"))?.token;
 
-  useEffect(() => {
-    const fetchPlans = async () => {
-      try {
-        const response = await fetch("http://localhost:8086/api/learningPlans/");
-        if (!response.ok) throw new Error("Failed to fetch learning plans");
+useEffect(() => {
+  const fetchPlans = async () => {
+    try {
+      const response = await fetch("http://localhost:8086/api/learningPlans/", {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      if (!response.ok) throw new Error("Failed to fetch learning plans");
 
-        const allPlans = await response.json();
-        const user = JSON.parse(localStorage.getItem("user"));
-        const userId = user?.id;
+      const allPlans = await response.json();
+      const user = JSON.parse(localStorage.getItem("user"));
+      const userId = user?.id;
 
-        // Filter for current user's plans
-        const userPlans = allPlans.filter(plan => plan.userId === userId);
+      // Filter for current user's plans
+      const userPlans = allPlans.filter(plan => plan.userId === userId);
 
-        // Convert API format into structure expected by <LearningPlaneCard />
-        const structuredPlans = userPlans.map(plan => {
-          const weeks = plan.weeks.map((week, index) => {
-            // group 3 milestones per week (or fewer if not enough)
-            const weekMilestones = plan.milestones.slice(index * 3, (index + 1) * 3);
-            return {
-              week,
-              milestones: weekMilestones
-            };
-          });
-
+      // Convert API format into structure expected by <LearningPlaneCard />
+      const structuredPlans = userPlans.map(plan => {
+        const weeks = plan.weeks.map((week, index) => {
+          // group 3 milestones per week (or fewer if not enough)
+          const weekMilestones = plan.milestones.slice(index * 3, (index + 1) * 3);
           return {
-            id: plan.id,
-            title: plan.title,
-            description: plan.description,
-            weeks,
-            deadline: plan.deadline || null
+            week,
+            milestones: weekMilestones
           };
         });
 
-        setLearningPlans(structuredPlans);
-      } catch (err) {
-        console.error(err);
-        Swal.fire({
-          icon: "error",
-          title: "Error",
-          text: "Could not load learning plans.",
-        });
-      }
-    };
+        return {
+          id: plan.id,
+          title: plan.title,
+          description: plan.description,
+          weeks,
+          deadline: plan.deadline || null
+        };
+      });
 
-    fetchPlans();
-  }, []);
+      setLearningPlans(structuredPlans);
+    } catch (err) {
+      console.error(err);
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "Could not load learning plans.",
+      });
+    }
+  };
 
-  const handleDelete = async (planId) => {
+  fetchPlans();
+}, [token]);
+
+const handleDelete = async (planId) => {
   try {
     const response = await fetch(`http://localhost:8086/api/learningPlans/${planId}`, {
       method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
     });
 
     if (!response.ok) throw new Error("Delete failed");

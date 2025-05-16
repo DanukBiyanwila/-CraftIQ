@@ -3,6 +3,7 @@ import axios from 'axios';
 
 function UserCard() {
   const [userData, setUserData] = useState(null);
+   const token = JSON.parse(localStorage.getItem("user"))?.token;
 
   useEffect(() => {
     // Get user from localStorage
@@ -10,13 +11,18 @@ function UserCard() {
     if (!user || !user.id) return;
 
     // Fetch user data from API
-    axios.get(`http://localhost:8086/api/user/${user.id}`)
-      .then((res) => {
-        setUserData(res.data);
-      })
-      .catch((err) => {
-        console.error('Failed to fetch user data:', err);
-      });
+   axios.get(`http://localhost:8086/api/user/${user.id}`, {
+  headers: {
+    Authorization: `Bearer ${token}`,
+  },
+})
+.then((res) => {
+  setUserData(res.data);
+})
+.catch((err) => {
+  console.error('Failed to fetch user data:', err);
+});
+
   }, []);
 
   if (!userData) {

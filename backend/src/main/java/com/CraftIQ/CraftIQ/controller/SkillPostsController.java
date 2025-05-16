@@ -15,7 +15,7 @@ import java.util.List;
 @RestController
 @RequestMapping("api/skillposts")
 @RequiredArgsConstructor
-@CrossOrigin
+@CrossOrigin(origins = "http://localhost:3000")
 public class SkillPostsController {
 
     private final SkillPostsServiceImpl skillPostsService;

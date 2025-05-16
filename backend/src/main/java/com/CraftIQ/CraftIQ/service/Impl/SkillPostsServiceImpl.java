@@ -32,26 +32,41 @@ public class SkillPostsServiceImpl implements SkillPostsService {
     @Override
     @Transactional
     public SkillPostsDto postSkillPost(SkillPostsDto skillPostsDto , MultipartFile image) throws IOException {
-        // Convert DTO to Entity
-        SkillPosts skillPost = new SkillPosts();
-        mapper.map(skillPostsDto, skillPost);
+        SkillPosts skillPost;
+
+        if (skillPostsDto.getId() != null) {
+            // For update case: fetch the existing post first
+            skillPost = skillPostsRepository.findById(skillPostsDto.getId())
+                    .orElseThrow(() -> new RuntimeException("SkillPost not found"));
+            mapper.map(skillPostsDto, skillPost); // update fields except image
+        } else {
+            // For new post
+            skillPost = new SkillPosts();
+            mapper.map(skillPostsDto, skillPost);
+        }
 
         // Handle Image Upload
         if (image != null && !image.isEmpty()) {
             skillPost.setImageData(image.getBytes());
+        } else if (skillPostsDto.getId() != null) {
+            // Preserve existing image if not updated
+            SkillPosts existing = skillPostsRepository.findById(skillPostsDto.getId()).orElse(null);
+            if (existing != null && existing.getImageData() != null) {
+                skillPost.setImageData(existing.getImageData());
+            }
         }
 
-        // Ensure 'createdAt' is set to the current time if it is not already set in the DTO
+        // createdAt fallback
         if (skillPost.getCreatedAt() == null) {
             skillPost.setCreatedAt(LocalDateTime.now());
         }
 
-        // Map and attach feedbacks (if any)
+        // Feedbacks
         if (skillPostsDto.getFeedbacks() != null && !skillPostsDto.getFeedbacks().isEmpty()) {
             List<Feedback> feedbackEntities = skillPostsDto.getFeedbacks().stream()
                     .map(dto -> {
                         Feedback feedback = dto.toEntity(mapper);
-                        feedback.setSkillPost(skillPost); // ensure the feedback is linked to this post
+                        feedback.setSkillPost(skillPost);
                         return feedback;
                     })
                     .collect(Collectors.toList());
@@ -59,23 +74,20 @@ public class SkillPostsServiceImpl implements SkillPostsService {
             skillPost.setFeedbacks(feedbackEntities);
         }
 
-        // Link the user to this skill post (based on the user in the SkillPostsDto)
+        // Link user
         if (skillPostsDto.getUser() != null) {
             User user = mapper.map(skillPostsDto.getUser(), User.class);
-            skillPost.setUser(user); // Link the user to the skill post
+            skillPost.setUser(user);
         }
 
-        // Save the SkillPost (with cascade, feedbacks, and user will also be saved)
         SkillPosts savedSkillPost = skillPostsRepository.save(skillPost);
-
-
         SkillPostsDto savedDto = savedSkillPost.toDto(mapper);
 
+        // Return image back as base64
         if (savedSkillPost.getImageData() != null) {
             savedDto.setImageBase64(Base64.getEncoder().encodeToString(savedSkillPost.getImageData()));
         }
 
-        // Convert and return DTO
         return savedDto;
     }
 
