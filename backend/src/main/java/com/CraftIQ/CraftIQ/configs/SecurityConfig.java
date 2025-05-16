@@ -1,5 +1,7 @@
 package com.CraftIQ.CraftIQ.configs;
 
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.filter.CorsFilter;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +30,11 @@ public class SecurityConfig {
     private JwtRequestFilter jwtFilter;
 
     @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
+    @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
@@ -46,7 +53,7 @@ public class SecurityConfig {
         return config.getAuthenticationManager();
     }
 
-    // ✅ Register CorsFilter instead of using .cors()
+    // Register CorsFilter instead of using .cors()
     @Bean
     public FilterRegistrationBean<CorsFilter> corsFilter() {
         CorsConfiguration config = new CorsConfiguration();

@@ -15,6 +15,7 @@ import com.CraftIQ.CraftIQ.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -30,6 +31,7 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final FeedbackRepository feedbackRepository;
     private final ModelMapper mapper;
+    private final PasswordEncoder passwordEncoder;
     @Autowired
     private JwtUtil jwtUtil;
 
@@ -87,6 +89,8 @@ public class UserServiceImpl implements UserService {
                     .collect(Collectors.toSet());
             user.setSkillPosts(skillPostEntities); // Associate posts with the user
         }
+
+        user.setPassword(passwordEncoder.encode(userDto.getPassword()));
 
         // 5. Save Entity
         User savedUser = userRepository.save(user);
@@ -262,8 +266,9 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findByEmail(loginRequestDto.getEmail())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        // Check password
-        if (!user.getPassword().equals(loginRequestDto.getPassword())) {
+
+        // Check password using BCrypt
+        if (!passwordEncoder.matches(loginRequestDto.getPassword(), user.getPassword())) {
             throw new RuntimeException("Invalid password");
         }
 
