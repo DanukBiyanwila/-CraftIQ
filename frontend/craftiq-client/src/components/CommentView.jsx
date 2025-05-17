@@ -1,13 +1,12 @@
 // src/components/CommentView.jsx
 import React from 'react';
-
 function CommentView({ comment }) {
   return (
     <div className="comment-list">
       <div className="single-comment justify-content-between d-flex">
         <div className="user justify-content-between d-flex">
           <div className="thumb">
-            <img src={comment.img} alt="" />
+            <img src={comment.img} alt="user profile" style={{ width: 50, height: 50, borderRadius: '50%' }} />
           </div>
           <div className="desc">
             <p className="comment">{comment.pargrhap}</p>
@@ -26,5 +25,6 @@ function CommentView({ comment }) {
     </div>
   );
 }
+
 
 export default CommentView;

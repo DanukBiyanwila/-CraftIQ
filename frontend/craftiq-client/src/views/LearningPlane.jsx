@@ -1,88 +1,106 @@
-import React, { useState } from 'react';
-import Swal from 'sweetalert2';
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import LearningPlaneCard from "../components/learningPlane/LearningPlaneCard"; 
+import Swal from "sweetalert2";
 
 function LearningPlane() {
-  const today = new Date();
-  const [currentMonth, setCurrentMonth] = useState(today.getMonth()); // 0-11
-  const [currentYear, setCurrentYear] = useState(today.getFullYear());
+  const [learningPlans, setLearningPlans] = useState([]);
+  const navigate = useNavigate();
+const token = JSON.parse(localStorage.getItem("user"))?.token;
 
-  const monthNames = [
-    'January', 'February', 'March', 'April', 'May', 'June',
-    'July', 'August', 'September', 'October', 'November', 'December'
-  ];
-
-  const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
-
-  const handleDayClick = (day) => {
-    const selectedDate = new Date(currentYear, currentMonth, day).toLocaleDateString();
-
-    Swal.fire({
-      title: `Add Learning Plan for ${selectedDate}`,
-      html:
-        `<input id="plan-title" class="swal2-input" placeholder="Title">` +
-        `<input id="plan-category" class="swal2-input" placeholder="Category">` +
-        `<textarea id="plan-description" class="swal2-textarea" placeholder="Description"></textarea>`,
-      showCancelButton: true,
-      confirmButtonText: 'Save',
-      preConfirm: () => {
-        const title = document.getElementById('plan-title').value;
-        const category = document.getElementById('plan-category').value;
-        const description = document.getElementById('plan-description').value;
-        if (!title || !category || !description) {
-          Swal.showValidationMessage('All fields are required');
+useEffect(() => {
+  const fetchPlans = async () => {
+    try {
+      const response = await fetch("http://localhost:8086/api/learningPlans/", {
+        headers: {
+          Authorization: `Bearer ${token}`
         }
-        return { title, category, description, date: selectedDate };
-      }
-    }).then((result) => {
-      if (result.isConfirmed) {
-        console.log('Learning Plan:', result.value);
-        Swal.fire('Saved!', 'Your learning plan has been saved.', 'success');
+      });
+      if (!response.ok) throw new Error("Failed to fetch learning plans");
+
+      const allPlans = await response.json();
+      const user = JSON.parse(localStorage.getItem("user"));
+      const userId = user?.id;
+
+      // Filter for current user's plans
+      const userPlans = allPlans.filter(plan => plan.userId === userId);
+
+      // Convert API format into structure expected by <LearningPlaneCard />
+      const structuredPlans = userPlans.map(plan => {
+        const weeks = plan.weeks.map((week, index) => {
+          // group 3 milestones per week (or fewer if not enough)
+          const weekMilestones = plan.milestones.slice(index * 3, (index + 1) * 3);
+          return {
+            week,
+            milestones: weekMilestones
+          };
+        });
+
+        return {
+          id: plan.id,
+          title: plan.title,
+          description: plan.description,
+          weeks,
+          deadline: plan.deadline || null
+        };
+      });
+
+      setLearningPlans(structuredPlans);
+    } catch (err) {
+      console.error(err);
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "Could not load learning plans.",
+      });
+    }
+  };
+
+  fetchPlans();
+}, [token]);
+
+const handleDelete = async (planId) => {
+  try {
+    const response = await fetch(`http://localhost:8086/api/learningPlans/${planId}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`
       }
     });
-  };
 
-  const goToPreviousMonth = () => {
-    if (currentMonth === 0) {
-      setCurrentMonth(11);
-      setCurrentYear((prev) => prev - 1);
-    } else {
-      setCurrentMonth((prev) => prev - 1);
-    }
-  };
+    if (!response.ok) throw new Error("Delete failed");
 
-  const goToNextMonth = () => {
-    if (currentMonth === 11) {
-      setCurrentMonth(0);
-      setCurrentYear((prev) => prev + 1);
-    } else {
-      setCurrentMonth((prev) => prev + 1);
-    }
-  };
+    Swal.fire({
+      icon: "success",
+      title: "Deleted!",
+      text: "Learning Plan has been deleted.",
+    });
+
+    setLearningPlans(prev => prev.filter(plan => plan.id !== planId));
+  } catch (err) {
+    console.error("Delete error:", err);
+    Swal.fire({
+      icon: "error",
+      title: "Delete Failed",
+      text: "Could not delete the learning plan.",
+    });
+  }
+};
+
 
   return (
-    <div className="calendar-container">
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <button  className="shedule-btn" onClick={goToPreviousMonth}> Prev</button>
-        <h2>{monthNames[currentMonth]} {currentYear}</h2>
-        <button className="shedule-btn" onClick={goToNextMonth}>Next</button>
-      </div>
+    <div>
+      <button className="btn btn-primary mt-40 ml-10" onClick={() => navigate('/user/plane-create')}>
+        Add Learning Plan
+      </button>
 
-      <div className="calendar-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '10px', marginTop: '20px' }}>
-        {Array.from({ length: daysInMonth }, (_, i) => (
-          <div key={i + 1} className="calendar-day" onClick={() => handleDayClick(i + 1)}
-            style={{
-              padding: '10px',
-              background: '#f0f0f0',
-              borderRadius: '5px',
-              cursor: 'pointer',
-              transition: '0.2s'
-            }}>
-            {i + 1}
-            <div>Title</div>
-         
-          </div>
-        ))}
-      </div>
+      {learningPlans.length > 0 ? (
+        learningPlans.map(plan => (
+          <LearningPlaneCard key={plan.id} LearningPlane={plan} onDelete={handleDelete} />
+        ))
+      ) : (
+        <p className="text-center mt-4">No Learning Plans found.</p>
+      )}
     </div>
   );
 }

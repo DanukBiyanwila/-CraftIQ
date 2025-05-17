@@ -1,10 +1,13 @@
 package com.CraftIQ.CraftIQ.entity;
 
+import com.CraftIQ.CraftIQ.dto.FeedbackDto;
+import com.CraftIQ.CraftIQ.dto.SkillPostsDto;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.modelmapper.ModelMapper;
 
 import java.time.LocalDateTime;
 
@@ -31,8 +34,33 @@ public class Feedback {
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
-    @Column(name = "like_count", nullable = false)
+    @Column(name = "like_count")
     private String likeCount;
 
-    // Removed relationship with SkillPosts
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "skill_post_id", nullable = false)
+    private SkillPosts skillPost;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
+
+
+    public FeedbackDto toDto(ModelMapper mapper) {
+        FeedbackDto dto = mapper.map(this, FeedbackDto.class);
+
+        // Manually set skillPostId and userId to avoid null from mapper
+        if (this.skillPost != null) {
+            dto.setSkillPostId(this.skillPost.getId());
+        }
+
+        if (this.user != null) {
+            dto.setUserId(this.user.getId());
+        }
+
+        return dto;
+    }
+
+
 }

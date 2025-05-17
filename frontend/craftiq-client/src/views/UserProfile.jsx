@@ -3,6 +3,8 @@ import UserData from '../data/UserData';
 import SingleBlog from '../components/blog/SingleBlog';
 import { Link } from 'react-router-dom';
 import UserCard from '../components/UserProfile/UserCard';
+import SingleUser from '../components/UserProfile/SingleUser';
+import UserDetails from '../components/UserProfile/UserDetails';
 function UserProfile() {
   return (
     <div className="profile">
@@ -19,7 +21,11 @@ function UserProfile() {
           {/* /Breadcrumb */}
           <div className="row gutters-sm">
             <div className="col-md-4 mb-3">
+
+              {/* User card  */}
               <UserCard/>
+
+              
               <div className="card mt-3">
                 <ul className="list-group list-group-flush">
                   <li className="list-group-item d-flex justify-content-between align-items-center flex-wrap">
@@ -54,62 +60,18 @@ function UserProfile() {
               <div className="card mt-3">
                 <Link to="/user/learning-plane" className="btn btn-primary">Learning Plane Managment</Link>
               </div>
+               <div className="card mt-3">
+                <Link to="/user/progress-view" className="btn btn-primary">Progress View</Link>
+              </div>
               
             </div>
             <div className="col-md-8">
               <div className="card mb-3">
                 <div className="card-body">
-                  <div className="row">
-                    <div className="col-sm-3">
-                      <h6 className="mb-0">Full Name</h6>
-                    </div>
-                    <div className="col-sm-9 text-secondary">
-                      Kenneth Valdez
-                    </div>
-                  </div>
-                  <hr />
-                  <div className="row">
-                    <div className="col-sm-3">
-                      <h6 className="mb-0">Email</h6>
-                    </div>
-                    <div className="col-sm-9 text-secondary">
-                      fip@jukmuh.al
-                    </div>
-                  </div>
-                  <hr />
-                  <div className="row">
-                    <div className="col-sm-3">
-                      <h6 className="mb-0">Phone</h6>
-                    </div>
-                    <div className="col-sm-9 text-secondary">
-                      (239) 816-9029
-                    </div>
-                  </div>
-                  <hr />
-                  <div className="row">
-                    <div className="col-sm-3">
-                      <h6 className="mb-0">Mobile</h6>
-                    </div>
-                    <div className="col-sm-9 text-secondary">
-                      (320) 380-4539
-                    </div>
-                  </div>
-                  <hr />
-                  <div className="row">
-                    <div className="col-sm-3">
-                      <h6 className="mb-0">Address</h6>
-                    </div>
-                    <div className="col-sm-9 text-secondary">
-                      Bay Area, San Francisco, CA
-                    </div>
-                  </div>
-                  <hr />
-                  <div className="row">
-                    <div className="col-sm-12">
-                      <Link to="/user/user-edit" className="btn btn-info ">Edit</Link>
-                      <Link to="/user/user-edit" className="btn btn-info ml-3 ">Delete</Link>
-                    </div>
-                  </div>
+                 
+
+                 <UserDetails/>
+                 
                 </div>
               </div>
 
@@ -168,13 +130,13 @@ function UserProfile() {
                     </div>
                   </div>
                 </div>
-                {UserData.slice(0, 6).map(blog => (
-                  <SingleBlog key={blog.id} blog={blog} />
-                ))}
+                {/* {UserData.slice(0, 6).map(user => (
+                  <SingleUser key={user.id} user={user} />
+                ))} */}
 
                 <div className="col-sm-12">
                
-                  <Link to="/user/find-user"className="btn btn-info " >Find User</Link>
+                  {/* <Link to="/user/find-user"className="btn btn-info " >Find User</Link> */}
                 </div>
               </div>
             </div>
