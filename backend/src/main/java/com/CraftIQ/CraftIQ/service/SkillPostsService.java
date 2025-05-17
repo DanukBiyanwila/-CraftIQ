@@ -1,12 +1,15 @@
 package com.CraftIQ.CraftIQ.service;
 
 import com.CraftIQ.CraftIQ.dto.SkillPostsDto;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 public interface SkillPostsService {
+
     // Create a new SkillPost
-    public SkillPostsDto postSkillPost(SkillPostsDto skillPostsDto);
+    public SkillPostsDto postSkillPost(SkillPostsDto skillPostsDto, MultipartFile image) throws IOException;
 
     // Get all SkillPosts
     public List<SkillPostsDto> getAllSkillPosts();

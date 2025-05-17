@@ -1,17 +1,11 @@
 import React, { useState } from 'react';
 
-import { Link } from 'react-router-dom';
+
+import UserCard from '../components/UserProfile/UserCard';
+import UserDetailsEdit from '../components/UserProfile/UserDetailsEdit';
 function UserEdit() {
 
-    const [image, setImage] = useState('https://bootdey.com/img/Content/avatar/avatar7.png');
 
-    const handleImageChange = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            const imageUrl = URL.createObjectURL(file);
-            setImage(imageUrl);
-        }
-    };
     return (
         <div className="profile">
             <div className="container">
@@ -27,37 +21,7 @@ function UserEdit() {
                     {/* /Breadcrumb */}
                     <div className="row gutters-sm">
                         <div className="col-md-4 mb-3">
-                            <div className="card">
-                                <div className="card-body">
-                                    <div className="d-flex flex-column align-items-center text-center">
-                                        <label htmlFor="profileImageInput" style={{ cursor: 'pointer' }}>
-                                            <img
-                                                src={image}
-                                                alt="Profile"
-                                                className="rounded-circle"
-                                                width={150}
-                                                height={150}
-                                            />
-                                            <input
-                                                id="profileImageInput"
-                                                type="file"
-                                                accept="image/*"
-                                                onChange={handleImageChange}
-                                                style={{ display: 'none' }}
-                                            />
-                                        </label>
-
-                                        <div className="mt-3">
-                                            <h4>John Doe</h4>
-                                            <p className="text-secondary mb-1">Full Stack Developer</p>
-                                            <p className="text-muted font-size-sm">Bay Area, San Francisco, CA</p>
-                                            <p className="text-muted font-size-sm">Followers: 320</p>
-                                            <p className="text-muted font-size-sm">Following: 220</p>
-                                         
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                          <UserCard/>
                             <div className="card mt-3">
                                 <ul className="list-group list-group-flush">
                                     <li className="list-group-item d-flex justify-content-between align-items-center flex-wrap">
@@ -155,101 +119,7 @@ function UserEdit() {
                         <div className="col-md-8">
                             <div className="card mb-3">
                                 <div className="card-body">
-                                    <div className="row">
-                                        <div className="col-sm-3">
-                                            <h6 className="mb-0">Full Name</h6>
-                                        </div>
-                                        <div className="col-sm-9 text-secondary">
-                                            <input
-                                                type="text"
-                                                className="form-control border-0 p-0"
-                                                placeholder="Kenneth Valdez"
-                                                style={{ outline: "none", backgroundColor: "transparent" }}
-                                            />
-                                        </div>
-                                    </div>
-                                    <hr />
-                                    <div className="row">
-                                        <div className="col-sm-3">
-                                            <h6 className="mb-0">Email</h6>
-                                        </div>
-                                        <div className="col-sm-9 text-secondary">
-                                            <input
-                                                type="email"
-                                                className="form-control border-0 p-0"
-                                                placeholder="fip@jukmuh.al"
-                                                style={{ outline: "none", backgroundColor: "transparent" }}
-                                            />
-                                        </div>
-                                    </div>
-                                    <hr />
-                                    <div className="row">
-                                        <div className="col-sm-3">
-                                            <h6 className="mb-0">Phone</h6>
-                                        </div>
-                                        <div className="col-sm-9 text-secondary">
-                                            <input
-                                                type="tel"
-                                                className="form-control border-0 p-0"
-                                                placeholder="(239) 816-9029"
-                                                style={{ outline: "none", backgroundColor: "transparent" }}
-                                            />
-                                        </div>
-                                    </div>
-                                    <hr />
-                                    <div className="row">
-                                        <div className="col-sm-3">
-                                            <h6 className="mb-0">Mobile</h6>
-                                        </div>
-                                        <div className="col-sm-9 text-secondary">
-                                            <input
-                                                type="tel"
-                                                className="form-control border-0 p-0"
-                                                placeholder="(320) 380-4539"
-                                                style={{ outline: "none", backgroundColor: "transparent" }}
-                                            />
-                                        </div>
-                                    </div>
-                                    <hr />
-                                    <div className="row">
-                                        <div className="col-sm-3">
-                                            <h6 className="mb-0">Address</h6>
-                                        </div>
-                                        <div className="col-sm-9 text-secondary">
-                                            <input
-                                                type="text"
-                                                className="form-control border-0 p-0"
-                                                placeholder="Bay Area, San Francisco, CA"
-                                                style={{ outline: "none", backgroundColor: "transparent" }}
-                                            />
-                                        </div>
-                                    </div>
-                                    <hr />
-
-                                    <div className="row">
-                                        <div className="col-sm-3">
-                                            <h6 className="mb-0">Achievements</h6>
-                                        </div>
-                                        <div className="col-sm-9 text-secondary">
-                                            <select
-                                                className="form-control border-0 p-0"
-                                                style={{ outline: "none", backgroundColor: "transparent", color: "#6c757d" }}
-                                            >
-                                                <option value="">Select Achievements</option>
-                                                <option value="sf">100 Days Of Code</option>
-                                                <option value="ny">First Post</option>
-                                                <option value="la">5 Skill Shered </option>
-                                                <option value="la">Top Contributor </option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <hr />
-
-                                    <div className="row">
-                                        <div className="col-sm-12">
-                                            <Link to="/user/user-edit" className="btn btn-info">Save</Link>
-                                        </div>
-                                    </div>
+                                   <UserDetailsEdit/>
                                 </div>
                             </div>
                         </div>
