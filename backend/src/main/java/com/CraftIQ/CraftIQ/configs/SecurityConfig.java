@@ -1,5 +1,6 @@
 package com.CraftIQ.CraftIQ.configs;
 
+import org.springframework.http.HttpMethod;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.filter.CorsFilter;
@@ -41,6 +42,9 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/**", "/api/user/login", "/api/user/create", "/api/user/{id}/image", "/api/learningPlans/{id}").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/likes/like").authenticated()
+                        .requestMatchers(HttpMethod.DELETE, "/api/likes/unlike").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/likes/**").authenticated()
                         .anyRequest().authenticated()
                 );
 
