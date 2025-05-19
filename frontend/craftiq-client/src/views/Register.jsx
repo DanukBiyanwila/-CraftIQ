@@ -53,61 +53,78 @@ function Register() {
   };
 
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+ const handleSubmit = async (e) => {
+  e.preventDefault();
 
-    if (formData.password !== formData.confirmPassword) {
-      return Swal.fire('Error', 'Passwords do not match', 'error');
-    }
+  // Client-side validations
+  const { username, email, password, confirmPassword, image } = formData;
 
-    // Prepare JSON part of the form
-    const userJson = {
-      username: formData.username,
-      email: formData.email,
-      password: formData.password,
-    };
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-    const multipartData = new FormData();
-    multipartData.append('user', new Blob([JSON.stringify(userJson)], { type: 'application/json' }));
+  if (!username.trim()) {
+    return Swal.fire('Error', 'Username is required', 'error');
+  }
 
-    if (formData.image) {
-      multipartData.append('image', formData.image);
-    }
+  if (!emailRegex.test(email)) {
+    return Swal.fire('Error', 'Please enter a valid email address', 'error');
+  }
 
-    try {
-      const response = await fetch('http://localhost:8086/api/user/create', {
-        method: 'POST',
-        body: multipartData,  // FormData as body
-        // **No Content-Type header! Let browser set it automatically including boundary**
-      });
+  if (!image) {
+    return Swal.fire('Error', 'Profile image is required', 'error');
+  }
 
-      if (!response.ok) {
-        // Try to parse error message from backend if JSON
-        let errorMessage = 'Registration failed!';
-        try {
-          const errorData = await response.json();
-          errorMessage = errorData.message || errorMessage;
-        } catch {
-          // ignore JSON parse errors
-        }
-        throw new Error(errorMessage);
-      }
+  if (password.length < 6) {
+    return Swal.fire('Error', 'Password must be at least 6 characters', 'error');
+  }
 
-      Swal.fire('Success', 'Account created successfully!', 'success');
+  if (password !== confirmPassword) {
+    return Swal.fire('Error', 'Passwords do not match', 'error');
+  }
 
-      // Optional: reset form fields
-      setFormData({
-        username: '',
-        email: '',
-        password: '',
-        confirmPassword: '',
-        image: null,
-      });
-
-    } catch (error) {
-      Swal.fire('Error', error.message, 'error');
-    }
+  // Prepare JSON part of the form
+  const userJson = {
+    username: formData.username,
+    email: formData.email,
+    password: formData.password,
   };
+
+  const multipartData = new FormData();
+  multipartData.append('user', new Blob([JSON.stringify(userJson)], { type: 'application/json' }));
+
+  if (formData.image) {
+    multipartData.append('image', formData.image);
+  }
+
+  try {
+    const response = await fetch('http://localhost:8086/api/user/create', {
+      method: 'POST',
+      body: multipartData,
+    });
+
+    if (!response.ok) {
+      let errorMessage = 'Registration failed!';
+      try {
+        const errorData = await response.json();
+        errorMessage = errorData.message || errorMessage;
+      } catch {}
+      throw new Error(errorMessage);
+    }
+
+    Swal.fire('Success', 'Account created successfully!', 'success');
+
+    setFormData({
+      username: '',
+      email: '',
+      password: '',
+      confirmPassword: '',
+      image: null,
+    });
+
+  } catch (error) {
+    Swal.fire('Error', error.message, 'error');
+  }
+};
+
 
 
 
