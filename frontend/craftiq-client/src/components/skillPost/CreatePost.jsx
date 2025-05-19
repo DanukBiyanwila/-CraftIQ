@@ -37,89 +37,101 @@ function CreatePost() {
   const triggerFileInput = () => {
     fileInputRef.current.click(); // simulate click on hidden file input
   };
+const token = JSON.parse(localStorage.getItem("user"))?.token;
 
-  useEffect(() => {
-    const userData = JSON.parse(localStorage.getItem("user")); // retrieve stored object
-    const userId = userData?.id;
-    console.log("user Id : ", userId);
+useEffect(() => {
+  const userData = JSON.parse(localStorage.getItem("user")); // retrieve stored object
+  const userId = userData?.id;
 
-    if (userId) {
-      axios.get(`http://localhost:8086/api/user/${userId}`)
-        .then((res) => {
-          setUser(res.data);
-        })
-        .catch((err) => {
-          console.error("Failed to fetch user data:", err);
-        });
-    }
-  }, []);
+  console.log("user Id : ", userId);
 
-  const handleSubmit = async () => {
-    const userData = JSON.parse(localStorage.getItem("user"));
-    const userId = userData?.id;
-
-    if (!userId) {
-      alert("User not found. Please log in again.");
-      return;
-    }
-
-    const formData = new FormData();
-
-    const skillPost = {
-      title,
-      summary,
-      pargrhap1: p1,
-      pargrhap2: p2,
-      pargrhap3: p3,
-      pargrhap4: p4,
-      pargrhap5: p5,
-      createdAt: new Date().toISOString(),
-      category,
-      tags,
-      user: {
-        id: userId
+  if (userId && token) {
+    axios.get(`http://localhost:8086/api/user/${userId}`, {
+      headers: {
+        "Authorization": `Bearer ${token}`
       }
-    };
+    })
+    .then((res) => {
+      setUser(res.data);
+    })
+    .catch((err) => {
+      console.error("Failed to fetch user data:", err);
+    });
+  }
+}, []);
 
-    formData.append(
-      "skillPost",
-      new Blob([JSON.stringify(skillPost)], { type: "application/json" })
-    );
 
-    if (selectedFile) {
-      formData.append("image", selectedFile);
+const handleSubmit = async () => {
+  const userData = JSON.parse(localStorage.getItem("user"));
+  const userId = userData?.id;
+  const token = userData?.token;
+
+  if (!userId || !token) {
+    alert("User not found or not logged in. Please log in again.");
+    return;
+  }
+
+  const formData = new FormData();
+
+  const skillPost = {
+    title,
+    summary,
+    pargrhap1: p1,
+    pargrhap2: p2,
+    pargrhap3: p3,
+    pargrhap4: p4,
+    pargrhap5: p5,
+    createdAt: new Date().toISOString(),
+    category,
+    tags,
+    user: {
+      id: userId
     }
+  };
 
- try {
-  const response = await axios.post(
-    "http://localhost:8086/api/skillposts/create",
-    formData,
-    {
-      headers: { "Content-Type": "multipart/form-data" }
-    }
+  formData.append(
+    "skillPost",
+    new Blob([JSON.stringify(skillPost)], { type: "application/json" })
   );
 
-  Swal.fire({
-    title: 'Success!',
-    text: 'Post created successfully!',
-    icon: 'success',
-    timer: 1500,
-    showConfirmButton: false
-  }).then(() => {
-    navigate('/user/viewSkillPost');
-  });
+  if (selectedFile) {
+    formData.append("image", selectedFile);
+  }
 
-} catch (error) {
-  console.error("Error creating skill post:", error);
+  try {
+    const response = await axios.post(
+      "http://localhost:8086/api/skillposts/create",
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          "Authorization": `Bearer ${token}`
+        }
+      }
+    );
 
-  Swal.fire({
-    title: 'Error!',
-    text: 'Failed to create post.',
-    icon: 'error',
-    confirmButtonText: 'OK'
-  });
-}
-  };
+    Swal.fire({
+      title: 'Success!',
+      text: 'Post created successfully!',
+      icon: 'success',
+      timer: 1500,
+      showConfirmButton: false
+    }).then(() => {
+      navigate('/user/viewSkillPost');
+    });
+
+  } catch (error) {
+    console.error("Error creating skill post:", error);
+
+    Swal.fire({
+      title: 'Error!',
+      text: 'Failed to create post.',
+      icon: 'error',
+      confirmButtonText: 'OK'
+    });
+  }
+};
+
 
 
 

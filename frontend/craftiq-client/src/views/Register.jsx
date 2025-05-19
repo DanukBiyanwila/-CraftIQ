@@ -26,7 +26,7 @@ function Register() {
       if (performance.navigation.type !== 1) {
         window.location.reload();
       }
-    }, 0); 
+    }, 0);
 
     return () => clearTimeout(refreshTimer);
   }, []);
@@ -35,28 +35,49 @@ function Register() {
     setMode((prev) => (prev === 'sign-in' ? 'sign-up' : 'sign-in'));
   };
 
-   const [formData, setFormData] = useState({
-  username: '',
-  email: '',
-  password: '',
-  confirmPassword: '',
-  image: null    // rename here
-});
+  const [formData, setFormData] = useState({
+    username: '',
+    email: '',
+    password: '',
+    confirmPassword: '',
+    image: null    // rename here
+  });
 
 
-const handleChange = (e) => {
-  const { name, value, files } = e.target;
-  setFormData(prev => ({
-    ...prev,
-    [name]: files ? files[0] : value
-  }));
-};
+  const handleChange = (e) => {
+    const { name, value, files } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: files ? files[0] : value
+    }));
+  };
 
 
-const handleSubmit = async (e) => {
+ const handleSubmit = async (e) => {
   e.preventDefault();
 
-  if (formData.password !== formData.confirmPassword) {
+  // Client-side validations
+  const { username, email, password, confirmPassword, image } = formData;
+
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  if (!username.trim()) {
+    return Swal.fire('Error', 'Username is required', 'error');
+  }
+
+  if (!emailRegex.test(email)) {
+    return Swal.fire('Error', 'Please enter a valid email address', 'error');
+  }
+
+  if (!image) {
+    return Swal.fire('Error', 'Profile image is required', 'error');
+  }
+
+  if (password.length < 6) {
+    return Swal.fire('Error', 'Password must be at least 6 characters', 'error');
+  }
+
+  if (password !== confirmPassword) {
     return Swal.fire('Error', 'Passwords do not match', 'error');
   }
 
@@ -77,25 +98,20 @@ const handleSubmit = async (e) => {
   try {
     const response = await fetch('http://localhost:8086/api/user/create', {
       method: 'POST',
-      body: multipartData,  // FormData as body
-      // **No Content-Type header! Let browser set it automatically including boundary**
+      body: multipartData,
     });
 
     if (!response.ok) {
-      // Try to parse error message from backend if JSON
       let errorMessage = 'Registration failed!';
       try {
         const errorData = await response.json();
         errorMessage = errorData.message || errorMessage;
-      } catch {
-        // ignore JSON parse errors
-      }
+      } catch {}
       throw new Error(errorMessage);
     }
 
     Swal.fire('Success', 'Account created successfully!', 'success');
 
-    // Optional: reset form fields
     setFormData({
       username: '',
       email: '',
@@ -111,45 +127,47 @@ const handleSubmit = async (e) => {
 
 
 
-const handleLogin = async (e) => {
-  e.preventDefault();
 
-  const loginData = {
-    email: formData.email,
-    password: formData.password
-  };
+  const handleLogin = async (e) => {
+    e.preventDefault();
 
-  try {
-    const response = await axios.post('http://localhost:8086/api/user/login', loginData, {
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    });
-
-    // Construct user object from response
-    const user = {
-      id: response.data.userId,
-      email: response.data.email,
-      role: response.data.role
+    const loginData = {
+      email: formData.email,
+      password: formData.password
     };
 
-    // Save to localStorage
-    localStorage.setItem('user', JSON.stringify(user));
-    console.log("User data : " , user)
+    try {
+      const response = await axios.post('http://localhost:8086/api/user/login', loginData, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
 
-    Swal.fire('Welcome', 'Login successful!', 'success').then(() => {
-  navigate('/user/home');
+      // Construct user object from response
+      const user = {
+        id: response.data.userId,
+        email: response.data.email,
+        role: response.data.role,
+        token: response.data.token
+      };
 
-  // Refresh after 0.5 second
-  setTimeout(() => {
-    window.location.reload();
-  }, 500);
-});
+      // Save to localStorage
+      localStorage.setItem('user', JSON.stringify(user));
+      console.log("User data : ", user)
 
-  } catch (error) {
-    Swal.fire('Login Failed', error.response?.data?.message || 'Invalid credentials', 'error');
-  }
-};
+      Swal.fire('Welcome', 'Login successful!', 'success').then(() => {
+        navigate('/user/home');
+
+        // Refresh after 0.5 second
+        setTimeout(() => {
+          window.location.reload();
+        }, 500);
+      });
+
+    } catch (error) {
+      Swal.fire('Login Failed', error.response?.data?.message || 'Invalid credentials', 'error');
+    }
+  };
 
 
 
@@ -160,38 +178,38 @@ const handleLogin = async (e) => {
         {/* FORM SECTION */}
         <div className="row">
           {/* SIGN UP */}
-        
-     <div className="col align-items-center flex-col sign-up">
-  <div className="form-wrapper align-items-center">
-    <form className="form sign-up" onSubmit={handleSubmit} encType="multipart/form-data">
-      <div className="input-group">
-        <i className="bx bxs-user" />
-        <input type="text" placeholder="Username" name="username" onChange={handleChange} required />
-      </div>
-      <div className="input-group">
-        <i className="bx bx-mail-send" />
-        <input type="email" placeholder="Email" name="email" onChange={handleChange} required />
-      </div>
-      <div className="input-group">
-        <i className="bx bxs-profile" />
-        <input type="file" name="image" onChange={handleChange} accept="image/*" required />
-      </div>
-      <div className="input-group">
-        <i className="bx bxs-lock-alt" />
-        <input type="password" placeholder="Password" name="password" onChange={handleChange} required />
-      </div>
-      <div className="input-group">
-        <i className="bx bxs-lock-alt" />
-        <input type="password" placeholder="Confirm Password" name="confirmPassword" onChange={handleChange} required />
-      </div>
-      <button type="submit">Sign up</button>
-      <p>
-        <span>Already have an account?</span>
-        <b onClick={toggle} className="pointer">Sign in here</b>
-      </p>
-    </form>
-  </div>
-</div>
+
+          <div className="col align-items-center flex-col sign-up">
+            <div className="form-wrapper align-items-center">
+              <form className="form sign-up" onSubmit={handleSubmit} encType="multipart/form-data">
+                <div className="input-group">
+                  <i className="bx bxs-user" />
+                  <input type="text" placeholder="Username" name="username" onChange={handleChange} required />
+                </div>
+                <div className="input-group">
+                  <i className="bx bx-mail-send" />
+                  <input type="email" placeholder="Email" name="email" onChange={handleChange} required />
+                </div>
+                <div className="input-group">
+                  <i className="bx bxs-profile" />
+                  <input type="file" name="image" onChange={handleChange} accept="image/*" required />
+                </div>
+                <div className="input-group">
+                  <i className="bx bxs-lock-alt" />
+                  <input type="password" placeholder="Password" name="password" onChange={handleChange} required />
+                </div>
+                <div className="input-group">
+                  <i className="bx bxs-lock-alt" />
+                  <input type="password" placeholder="Confirm Password" name="confirmPassword" onChange={handleChange} required />
+                </div>
+                <button type="submit">Sign up</button>
+                <p>
+                  <span>Already have an account?</span>
+                  <b onClick={toggle} className="pointer">Sign in here</b>
+                </p>
+              </form>
+            </div>
+          </div>
 
 
           {/* END SIGN UP */}
@@ -200,27 +218,27 @@ const handleLogin = async (e) => {
           <div className="col align-items-center flex-col sign-in">
             <div className="form-wrapper align-items-center">
               <div className="form sign-in">
-               <div className="input-group">
-  <i className="bx bxs-user" />
-  <input
-    type="email"
-    placeholder="Email"
-    name="email"
-    onChange={handleChange}
-    required
-  />
-</div>
-<div className="input-group">
-  <i className="bx bxs-lock-alt" />
-  <input
-    type="password"
-    placeholder="Password"
-    name="password"
-    onChange={handleChange}
-    required
-  />
-</div>
-<button onClick={handleLogin}>Sign in</button>
+                <div className="input-group">
+                  <i className="bx bxs-user" />
+                  <input
+                    type="email"
+                    placeholder="Email"
+                    name="email"
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
+                <div className="input-group">
+                  <i className="bx bxs-lock-alt" />
+                  <input
+                    type="password"
+                    placeholder="Password"
+                    name="password"
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
+                <button onClick={handleLogin}>Sign in</button>
 
                 <p><b>Forgot password?</b></p>
                 <p>

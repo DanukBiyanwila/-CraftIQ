@@ -8,25 +8,31 @@ function CommentCreate({ postId }) {
   const [user, setUser] = useState(null); // full user object
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+ const token = JSON.parse(localStorage.getItem("user"))?.token;
 
+useEffect(() => {
+  const userData = JSON.parse(localStorage.getItem('user'));
 
-  useEffect(() => {
-    const userData = JSON.parse(localStorage.getItem('user'));
-    if (userData && userData.id) {
-      axios.get(`http://localhost:8086/api/user/${userData.id}`)
-        .then(res => {
-          setUser(res.data);
-          setLoading(false);
-        })
-        .catch(err => {
-          console.error("Error fetching user details", err);
-          setLoading(false);
-        });
-    } else {
-      console.error("User not found in localStorage");
-      setLoading(false);
-    }
-  }, []);
+  // Create headers with token
+  const headers = {
+    Authorization: `Bearer ${token}`
+  };
+
+  if (userData && userData.id) {
+    axios.get(`http://localhost:8086/api/user/${userData.id}`, { headers })
+      .then(res => {
+        setUser(res.data);
+        setLoading(false);
+      })
+      .catch(err => {
+        console.error("Error fetching user details", err);
+        setLoading(false);
+      });
+  } else {
+    console.error("User not found in localStorage");
+    setLoading(false);
+  }
+}, []);
 
 const handleSubmit = async (e) => {
   e.preventDefault();
@@ -40,9 +46,17 @@ const handleSubmit = async (e) => {
     return;
   }
 
+  // Set up headers with token
+  const headers = {
+    Authorization: `Bearer ${token}`
+  };
+
   try {
-    // Step 1: Fetch the skill post data
-    const postRes = await axios.get(`http://localhost:8086/api/skillposts/${postId}`);
+    // Step 1: Fetch the skill post data with auth
+    const postRes = await axios.get(
+      `http://localhost:8086/api/skillposts/${postId}`,
+      { headers }
+    );
     const postData = postRes.data;
 
     // Step 2: Compare current user ID with the post owner's ID
@@ -63,7 +77,12 @@ const handleSubmit = async (e) => {
       userId: user.id,
     };
 
-    await axios.post("http://localhost:8086/api/feedback/create", feedbackData);
+    await axios.post(
+      "http://localhost:8086/api/feedback/create",
+      feedbackData,
+      { headers } // Include token in POST request
+    );
+
     Swal.fire({
       icon: "success",
       title: "Feedback Submitted",

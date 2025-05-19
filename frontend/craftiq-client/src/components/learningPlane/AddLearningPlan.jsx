@@ -72,36 +72,39 @@ const handleSave = async () => {
   };
 
   console.log("New Learning Plan:", newPlan);
+ const token = JSON.parse(localStorage.getItem("user"))?.token;
 
-  try {
-    const response = await fetch("http://localhost:8086/api/learningPlans/create", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(newPlan),
-    });
+try {
+  const response = await fetch("http://localhost:8086/api/learningPlans/create", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`  // <-- Add this header
+    },
+    body: JSON.stringify(newPlan),
+  });
 
-    if (!response.ok) throw new Error("Failed to create learning plan");
+  if (!response.ok) throw new Error("Failed to create learning plan");
 
-    const data = await response.json();
-    console.log("Created Plan:", data);
+  const data = await response.json();
+  console.log("Created Plan:", data);
 
-    Swal.fire({
-      icon: "success",
-      title: "Success",
-      text: "Learning Plan Created Successfully!",
-    });
+  Swal.fire({
+    icon: "success",
+    title: "Success",
+    text: "Learning Plan Created Successfully!",
+  });
 
-    // Optional: clear form or redirect user
-  } catch (error) {
-    console.error("Error creating plan:", error);
-    Swal.fire({
-      icon: "error",
-      title: "Error",
-      text: "Something went wrong while creating the learning plan.",
-    });
-  }
+  // Optional: clear form or redirect user
+} catch (error) {
+  console.error("Error creating plan:", error);
+  Swal.fire({
+    icon: "error",
+    title: "Error",
+    text: "Something went wrong while creating the learning plan.",
+  });
+}
+
 };
 
 

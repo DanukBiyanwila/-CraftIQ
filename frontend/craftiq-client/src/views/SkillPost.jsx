@@ -15,42 +15,47 @@ function SkillPost() {
   const [skillPosts, setSkillPosts] = useState([]);
   const currentUser = JSON.parse(localStorage.getItem('user')); // Get user from localStorage
 
-  useEffect(() => {
-    axios.get('http://localhost:8086/api/skillposts/')
-      .then(response => {
-        const userPosts = response.data
-          .filter(post => post.user?.id === currentUser?.id) // filter by logged-in user
-          .map((post, index) => {
-            const createdAt = new Date(post.createdAt);
-            return {
-              id: post.id,
-              img: post.imageBase64
-                ? `data:image/jpeg;base64,${post.imageBase64}`
-                : imageFallbacks[index % imageFallbacks.length],
-              title: post.title,
-              summary: post.summary,
-              pargrhap_1: post.pargrhap1,
-              pargrhap_2: post.pargrhap2,
-              pargrhap_3: post.pargrhap3,
-              pargrhap_4: post.pargrhap4,
-              pargrhap_5: post.pargrhap5,
-              category: post.category || 'General',
-              commentCount: '03 Comments',
-              date: [
-                {
-                  day: createdAt.getDate().toString(),
-                  month: createdAt.toLocaleString('default', { month: 'short' }),
-                  year: createdAt.getFullYear().toString()
-                }
-              ]
-            };
-          });
-        setSkillPosts(userPosts);
-      })
-      .catch(error => {
-        console.error('Failed to fetch skill posts:', error);
-      });
-  }, [currentUser?.id]);
+ const token = JSON.parse(localStorage.getItem("user"))?.token;
+useEffect(() => {
+  const headers = {
+    Authorization: `Bearer ${token}`
+  };
+
+  axios.get('http://localhost:8086/api/skillposts/', { headers })
+    .then(response => {
+      const userPosts = response.data
+        .filter(post => post.user?.id === currentUser?.id) // filter by logged-in user
+        .map((post, index) => {
+          const createdAt = new Date(post.createdAt);
+          return {
+            id: post.id,
+            img: post.imageBase64
+              ? `data:image/jpeg;base64,${post.imageBase64}`
+              : imageFallbacks[index % imageFallbacks.length],
+            title: post.title,
+            summary: post.summary,
+            pargrhap_1: post.pargrhap1,
+            pargrhap_2: post.pargrhap2,
+            pargrhap_3: post.pargrhap3,
+            pargrhap_4: post.pargrhap4,
+            pargrhap_5: post.pargrhap5,
+            category: post.category || 'General',
+            commentCount: '03 Comments',
+            date: [
+              {
+                day: createdAt.getDate().toString(),
+                month: createdAt.toLocaleString('default', { month: 'short' }),
+                year: createdAt.getFullYear().toString()
+              }
+            ]
+          };
+        });
+      setSkillPosts(userPosts);
+    })
+    .catch(error => {
+      console.error('Failed to fetch skill posts:', error);
+    });
+}, [currentUser?.id]);
 
   return (
     <div>

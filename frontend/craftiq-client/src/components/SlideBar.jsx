@@ -5,13 +5,29 @@ import RecentPostCard from './skillPost/RecentPostCard'
 function SlideBar() {
   const [recentPosts, setRecentPosts] = useState([]);
 
+ 
   useEffect(() => {
     const fetchSkillPosts = async () => {
       try {
-        const response = await axios.get('http://localhost:8086/api/skillposts/');
+        // Retrieve token from localStorage
+        const storedUser = JSON.parse(localStorage.getItem('user'));
+        const token = storedUser?.token;
+
+        if (!token) {
+          console.error("No token found in localStorage");
+          return;
+        }
+
+        const response = await axios.get('http://localhost:8086/api/skillposts/', {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+
         const sortedPosts = response.data
           .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)) // newest first
           .slice(0, 6);
+
         setRecentPosts(sortedPosts);
       } catch (error) {
         console.error("Failed to fetch skill posts", error);
@@ -20,6 +36,7 @@ function SlideBar() {
 
     fetchSkillPosts();
   }, []);
+
 
   return (
     <div className="blog_right_sidebar">

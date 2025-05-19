@@ -9,27 +9,31 @@ function EditLearningPlan() {
   const [title, setTitle] = useState("");
   const [weeks, setWeeks] = useState([]);
 
-  // Fetch the learning plan
-  useEffect(() => {
-    axios
-      .get(`http://localhost:8086/api/learningPlans/${id}`)
-      .then((res) => {
-        const data = res.data;
+// Fetch the learning plan
+useEffect(() => {
+   const token = JSON.parse(localStorage.getItem("user"))?.token;
+  axios
+    .get(`http://localhost:8086/api/learningPlans/${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+    .then((res) => {
+      const data = res.data;
 
-        // Convert backend format to frontend format
-        const weekObjects = data.weeks.map((week, index) => ({
-          week,
-          milestones: data.milestones.slice(index * 3, index * 3 + 3) || [],
-        }));
+      const weekObjects = data.weeks.map((week, index) => ({
+        week,
+        milestones: data.milestones.slice(index * 3, index * 3 + 3) || [],
+      }));
 
-        setLearningPlan(data);
-        setTitle(data.title);
-        setWeeks(weekObjects);
-      })
-      .catch((err) => {
-        console.error("Error fetching learning plan:", err);
-      });
-  }, [id]);
+      setLearningPlan(data);
+      setTitle(data.title);
+      setWeeks(weekObjects);
+    })
+    .catch((err) => {
+      console.error("Error fetching learning plan:", err);
+    });
+}, [id]);
 
   const addMilestone = (weekIndex) => {
     const updatedWeeks = [...weeks];
@@ -72,38 +76,45 @@ function EditLearningPlan() {
     setWeeks(updatedWeeks);
   };
 
-  const handleSave = async () => {
-    const updatedMilestones = weeks.flatMap((w) => w.milestones);
-    const updatedWeekStrings = weeks.map((w) => w.week);
+const handleSave = async () => {
+  const token = JSON.parse(localStorage.getItem("user"))?.token;
 
-    const updatedPlan = {
-      ...learningPlan,
-      title,
-      weeks: updatedWeekStrings,
-      milestones: updatedMilestones,
-    };
-try {
-  await axios.put(`http://localhost:8086/api/learningPlans/${id}`, updatedPlan);
+  const updatedMilestones = weeks.flatMap((w) => w.milestones);
+  const updatedWeekStrings = weeks.map((w) => w.week);
 
-  Swal.fire({
-    icon: "success",
-    title: "Updated!",
-    text: "Learning Plan updated successfully!",
-    confirmButtonColor: "#3085d6"
-  });
-
-  navigate("/user/learning-plane");
-} catch (err) {
-  console.error("Failed to update plan:", err);
-
-  Swal.fire({
-    icon: "error",
-    title: "Update Failed",
-    text: "Failed to update the learning plan.",
-    confirmButtonColor: "#d33"
-  });
-}
+  const updatedPlan = {
+    ...learningPlan,
+    title,
+    weeks: updatedWeekStrings,
+    milestones: updatedMilestones,
   };
+
+  try {
+    await axios.put(`http://localhost:8086/api/learningPlans/${id}`, updatedPlan, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    Swal.fire({
+      icon: "success",
+      title: "Updated!",
+      text: "Learning Plan updated successfully!",
+      confirmButtonColor: "#3085d6",
+    });
+
+    navigate("/user/learning-plane");
+  } catch (err) {
+    console.error("Failed to update plan:", err);
+
+    Swal.fire({
+      icon: "error",
+      title: "Update Failed",
+      text: "Failed to update the learning plan.",
+      confirmButtonColor: "#d33",
+    });
+  }
+};
 
   if (!learningPlan) return <p>Loading...</p>;
 
