@@ -55,6 +55,7 @@ function Header() {
                           <li><Link to="/user/about">About us</Link></li> {/* Use Link for navigation */}    
                            <li><Link to="/user/find-user">Find User</Link></li>
                              <li><Link to="/user/follower">Folowers</Link></li>
+                             <li><Link to="/user/following">following</Link></li>
                         </ul>
                       </nav>
                     </div>

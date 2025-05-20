@@ -1,9 +1,3 @@
-import React from 'react'
-
-import singleblog1 from "../../assets/clients/img/blog/single_blog_1.png"
-import author from "../../assets/clients/img/blog/author.png"
-import next from "../../assets/clients/img/post/next.png"
-import preview from "../../assets/clients/img/post/preview.png"
 function SkillPostSingle( {skillPost, author } ) {
   return (
       <div>
@@ -15,8 +9,8 @@ function SkillPostSingle( {skillPost, author } ) {
                       <h2> {skillPost.title}
                       </h2>
                       <ul className="blog-info-link mt-3 mb-4">
-                        <li><a href="#"><i className="fa fa-user" /> Travel, Lifestyle</a></li>
-                        <li><a href="#"><i className="fa fa-comments" /> 03 Comments</a></li>
+                        <li><a href="#"><i className="fa fa-user" /> {author?.fullName || "Unknown Author"}</a></li>
+                        <li><a href="#"><i className="fa fa-comments" /> {skillPost.commentCount}</a></li>
                       </ul>
                       <p className="excert">
                         {skillPost.pargrhap_1}
@@ -58,7 +52,7 @@ function SkillPostSingle( {skillPost, author } ) {
           {author?.profileImage && (
             <img
               src={author.profileImage}
-              alt={author.fullName}
+              alt={author?.fullName || "Unknown Author"}
               style={{ width: "70px", height: "70px", borderRadius: "50%" }}
             />
           )}

@@ -2,7 +2,7 @@ import React from 'react';
 import img9 from '../../assets/clients/img/blog/single_blog_4.png';
 import { Link } from 'react-router-dom';
 
-function AllSkillPost({skillPost}) {
+function AllSkillPost({skillPost, onDelete }) {
     const { img, title, summary } = skillPost;
   return (
     <div className="all-skill-post-container">
@@ -29,9 +29,12 @@ function AllSkillPost({skillPost}) {
                 <Link to={`/user/editSkillPost/${skillPost.id}`} className="button primary-bg text-white btn_1 boxed-btn">
                   Edit
                 </Link>
-                <Link to="/user/home" className="button primary-bg text-white btn_1 boxed-btn">
+                <button
+                  onClick={() => onDelete(skillPost.id)}
+                  className="button danger-bg text-white btn_1 boxed-btn ml-2"
+                >
                   Delete
-                </Link>
+                </button>
               </div>
             </div>
           </div>

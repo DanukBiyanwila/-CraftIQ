@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import CommentView from '../components/CommentView'
-import CommentData from '../data/CommentData'
 import CommentCreate from '../components/CommentCreate'
 import SlideBar from '../components/SlideBar'
 import SkillPostSingle from '../components/skillPost/SkillPostSingle'
@@ -10,16 +9,20 @@ function SkillPostDetails() {
   const { id } = useParams();
   const [skillPost, setSkillPost] = useState(null);
   const [loading, setLoading] = useState(true);
-const [author, setAuthor] = useState(null);
-
+  const [author, setAuthor] = useState(null);
+ const token = JSON.parse(localStorage.getItem("user"))?.token;
   // Optionally: handle comments
   const [comments, setComments] = useState([]);
 
 useEffect(() => {
   setLoading(true);
 
+  const headers = {
+    Authorization: `Bearer ${token}`
+  };
+
   // Fetch Skill Post
-  axios.get(`http://localhost:8086/api/skillposts/${id}`)
+  axios.get(`http://localhost:8086/api/skillposts/${id}`, { headers })
     .then(response => {
       const post = response.data;
       const formattedPost = {
@@ -33,7 +36,7 @@ useEffect(() => {
         pargrhap_4: post.pargrhap4,
         pargrhap_5: post.pargrhap5,
         category: post.category || "General",
-        commentCount: post.commentCount || 0,
+        commentCount: Array.isArray(post.feedbacks) ? post.feedbacks.length : 0,
         user: post.user,
       };
 
@@ -41,7 +44,7 @@ useEffect(() => {
 
       // Fetch author
       if (post.user && post.user.id) {
-        axios.get(`http://localhost:8086/api/user/${post.user.id}`)
+        axios.get(`http://localhost:8086/api/user/${post.user.id}`, { headers })
           .then(userResponse => {
             const userData = userResponse.data;
             setAuthor({
@@ -53,7 +56,7 @@ useEffect(() => {
       }
 
       // Fetch all feedbacks and filter by skillPostId
-      axios.get(`http://localhost:8086/api/feedback/`)
+      axios.get(`http://localhost:8086/api/feedback/`, { headers })
         .then(async feedbackRes => {
           const allFeedbacks = feedbackRes.data;
 
@@ -64,7 +67,7 @@ useEffect(() => {
           const enrichedComments = await Promise.all(
             filteredFeedbacks.map(async (feedback) => {
               try {
-                const userRes = await axios.get(`http://localhost:8086/api/user/${feedback.userId}`);
+                const userRes = await axios.get(`http://localhost:8086/api/user/${feedback.userId}`, { headers });
                 const user = userRes.data;
                 return {
                   id: feedback.id,
@@ -109,14 +112,14 @@ useEffect(() => {
       <div className="container">
         <div className="row">
           <div className="col-lg-8 posts-list">
-            <SkillPostSingle skillPost={skillPost}  author={author} />
+            <SkillPostSingle skillPost={skillPost} author={author} />
 
-           <div className="comments-area">
-  <h4>{comments.length} Comments</h4>
-  {comments.map(comment => (
-    <CommentView key={comment.id} comment={comment} />
-  ))}
-</div>
+            <div className="comments-area">
+              <h4>{comments.length} Comments</h4>
+              {comments.map(comment => (
+                <CommentView key={comment.id} comment={comment} />
+              ))}
+            </div>
 
 
             <CommentCreate postId={id} />

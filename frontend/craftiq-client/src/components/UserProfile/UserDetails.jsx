@@ -1,15 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 function UserDetails() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
-  // Get userId from localStorage
   const localUserData = JSON.parse(localStorage.getItem('user'));
-  const userId = localUserData?.id || localUserData?.userId; // handle either id or userId key
+  const userId = localUserData?.id || localUserData?.userId;
+const token = localUserData?.token;
+
+
 
   useEffect(() => {
     if (!userId) {
@@ -18,20 +21,44 @@ function UserDetails() {
       return;
     }
 
-    const fetchUserData = async () => {
-      try {
-        setLoading(true);
-        const response = await axios.get(`http://localhost:8086/api/user/${userId}`);
-        setUser(response.data);
-      } catch (err) {
-        setError('Failed to fetch user data.');
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchUserData = async () => {
+  try {
+    setLoading(true);
+    const response = await axios.get(`http://localhost:8086/api/user/${userId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    setUser(response.data);
+  } catch (err) {
+    setError('Failed to fetch user data.');
+  } finally {
+    setLoading(false);
+  }
+};
+
 
     fetchUserData();
   }, [userId]);
+
+const handleDelete = async () => {
+  const confirmed = window.confirm("Are you sure you want to delete your account?");
+  if (!confirmed) return;
+
+  try {
+    await axios.delete(`http://localhost:8086/api/user/${userId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    localStorage.clear();
+    window.location.href = "/register"; 
+  } catch (err) {
+    console.error(err);
+    alert("Failed to delete user account.");
+  }
+};
+
 
   if (loading) return <p>Loading user details...</p>;
   if (error) return <p className="text-danger">{error}</p>;
@@ -92,9 +119,8 @@ function UserDetails() {
           <Link to="/user/user-edit" className="btn btn-info">
             Edit
           </Link>
-          <Link to="/user/user-edit" className="btn btn-info ml-3">
-            Delete
-          </Link>
+          <button onClick={handleDelete} className="btn btn-danger ml-3">Delete</button>
+
         </div>
       </div>
     </div>

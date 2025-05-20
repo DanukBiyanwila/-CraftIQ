@@ -80,9 +80,6 @@ public class LearningPlansServiceImpl implements LearningPlansService {
         // Update basic fields
         existingPlan.setTitle(learningPlansDto.getTitle());
         existingPlan.setDescription(learningPlansDto.getDescription());
-        existingPlan.setStartDate(learningPlansDto.getStartDate());
-        existingPlan.setEndDate(learningPlansDto.getEndDate());
-        existingPlan.setAuthor(learningPlansDto.getAuthor());
         existingPlan.setStatus(learningPlansDto.getStatus());
 
         // Update user if needed

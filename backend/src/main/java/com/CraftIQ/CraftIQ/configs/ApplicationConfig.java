@@ -2,11 +2,14 @@ package com.CraftIQ.CraftIQ.configs;
 
 import com.CraftIQ.CraftIQ.dto.UserDto;
 import com.CraftIQ.CraftIQ.entity.User;
+import jakarta.servlet.MultipartConfigElement;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
+import org.springframework.boot.web.servlet.MultipartConfigFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.util.unit.DataSize;
 
 @Configuration
 @RequiredArgsConstructor
@@ -38,6 +41,15 @@ public class ApplicationConfig {
 
         return modelMapper;
     }
+
+    @Bean
+    public MultipartConfigElement multipartConfigElement() {
+        MultipartConfigFactory factory = new MultipartConfigFactory();
+        factory.setMaxFileSize(DataSize.ofMegabytes(10));
+        factory.setMaxRequestSize(DataSize.ofMegabytes(10));
+        return factory.createMultipartConfig();
+    }
+
 
 
 

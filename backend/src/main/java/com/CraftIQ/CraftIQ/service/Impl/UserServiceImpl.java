@@ -1,5 +1,6 @@
 package com.CraftIQ.CraftIQ.service.Impl;
 
+import com.CraftIQ.CraftIQ.configs.JwtUtil;
 import com.CraftIQ.CraftIQ.dto.FeedbackDto;
 import com.CraftIQ.CraftIQ.dto.LoginRequestDto;
 import com.CraftIQ.CraftIQ.dto.LoginResponseDto;
@@ -13,6 +14,8 @@ import com.CraftIQ.CraftIQ.repository.UserRepository;
 import com.CraftIQ.CraftIQ.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -28,6 +31,9 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final FeedbackRepository feedbackRepository;
     private final ModelMapper mapper;
+    private final PasswordEncoder passwordEncoder;
+    @Autowired
+    private JwtUtil jwtUtil;
 
     // Create User
     @Override
@@ -83,6 +89,8 @@ public class UserServiceImpl implements UserService {
                     .collect(Collectors.toSet());
             user.setSkillPosts(skillPostEntities); // Associate posts with the user
         }
+
+        user.setPassword(passwordEncoder.encode(userDto.getPassword()));
 
         // 5. Save Entity
         User savedUser = userRepository.save(user);
@@ -254,40 +262,39 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public LoginResponseDto authenticateUser(LoginRequestDto loginRequestDto) {
-        // Find the user by email
+        // Find user
         User user = userRepository.findByEmail(loginRequestDto.getEmail())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        // Check if the password is correct
-        if (!user.getPassword().equals(loginRequestDto.getPassword())) {
+
+        // Check password using BCrypt
+        if (!passwordEncoder.matches(loginRequestDto.getPassword(), user.getPassword())) {
             throw new RuntimeException("Invalid password");
         }
 
-        // Check if the role is empty or not
+        // Assign role
         String role = user.getRole();
         if (role == null || role.isEmpty()) {
-            // User has no role assigned, treat as normal user
-            role = "USER";  // Default to "USER" if role is empty
+            role = "USER";
         }
 
-        if ("ADMIN".equalsIgnoreCase(role)) {
-            // Admin specific logic (if needed)
-            // You can return different responses or tokens for admin users
-        } else if ("USER".equalsIgnoreCase(role)) {
-            // User specific logic (if needed)
-            // You can return different responses or tokens for normal users
-        } else {
-            throw new RuntimeException("Invalid role");
-        }
+        //  Generate token
+        String token = jwtUtil.generateToken(user.getEmail());
 
-        // Response DTO setup
+        // Set up response DTO
         LoginResponseDto response = new LoginResponseDto();
         response.setMessage("Login successful");
         response.setUserId(user.getId());
         response.setEmail(user.getEmail());
         response.setRole(role);
+        response.setToken(token);  // Add token
 
         return response;
+    }
+
+    @Override
+    public User findById(Long id) {
+        return userRepository.findById(id).orElse(null);
     }
 
 }

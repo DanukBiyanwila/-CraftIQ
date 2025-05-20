@@ -1,24 +1,34 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-
-function LearningPlaneCard({ LearningPlane, onDelete }) {
+import Swal from "sweetalert2";
+function LearningPlaneCard({ LearningPlane , onDelete }) {
   const navigate = useNavigate();
 
   const handleEdit = () => {
     navigate(`/user/edit-learning-plane/${LearningPlane.id}`);
   };
 
-  const handleDelete = () => {
-    if (window.confirm("Are you sure you want to delete this learning plan?")) {
-      onDelete(LearningPlane.id);
-    }
+    const handleDelete = () => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "This will delete the learning plan permanently.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Yes, delete it!"
+    }).then((result) => {
+      if (result.isConfirmed) {
+        onDelete(LearningPlane.id);
+      }
+    });
   };
 
   return (
     <div>
       <div className="container mb-50 mt-50">
         <div className="w-95 w-md-75 w-lg-60 w-xl-55 mx-auto mb-6 text-center">
-          <h2 className="display-18 display-md-16 display-lg-14 mb-10">
+          <h4 className="display-18 display-md-16 display-lg-14 mb-10">
             {LearningPlane.title}
             <button
               onClick={handleEdit}
@@ -26,13 +36,10 @@ function LearningPlaneCard({ LearningPlane, onDelete }) {
             >
               Edit
             </button>
-            <button
-              onClick={handleDelete}
-              className="ml-2 btn btn-sm btn-outline-danger"
-            >
+            <span className="text-danger ml-60 cursor-pointer" onClick={handleDelete}>
               Delete
-            </button>
-          </h2>
+            </span>
+          </h4>
         </div>
 
         <div className="row">

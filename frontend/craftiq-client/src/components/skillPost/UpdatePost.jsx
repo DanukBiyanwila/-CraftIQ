@@ -1,8 +1,7 @@
 import React, { useState, useRef , useEffect } from 'react';
-import author from "../../assets/clients/img/blog/author.png";
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-
+import Swal from 'sweetalert2';
 function UpdatePost({ skillPost }) {
   const navigate = useNavigate();
   const fileInputRef = useRef(null);
@@ -79,20 +78,38 @@ function UpdatePost({ skillPost }) {
     fileInputRef.current.click();
   };
 
-  const handleSubmit = async () => {
-    try {
-      await axios.put(`http://localhost:8086/api/skillposts/${id}`, {
-        ...skillPost,
-        ...formData
-      });
-      console.log( "Skill Post Data : " , formData)
-      alert("Post updated successfully!");
-      navigate("/user/skillPost");
-    } catch (err) {
-      console.error("Update failed:", err);
-      alert("Failed to update post.");
-    }
-  };
+const handleSubmit = async () => {
+  try {
+    await axios.put(`http://localhost:8086/api/skillposts/${id}`, {
+      ...skillPost,
+      ...formData
+    });
+
+    console.log("Skill Post Data:", formData);
+
+    Swal.fire({
+      title: 'Success!',
+      text: 'Post updated successfully!',
+      icon: 'success',
+      timer: 1500,
+      showConfirmButton: false
+    });
+
+    // Navigate after delay to allow user to see the success message
+    setTimeout(() => {
+      navigate("/user/viewSkillPost");
+    }, 1600);
+
+  } catch (err) {
+    console.error("Update failed:", err);
+    Swal.fire({
+      title: 'Error!',
+      text: 'Failed to update post.',
+      icon: 'error',
+      confirmButtonText: 'OK'
+    });
+  }
+};
 
   return (
     <div>

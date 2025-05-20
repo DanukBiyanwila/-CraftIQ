@@ -3,69 +3,83 @@ import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Swal from 'sweetalert2';
 function UserDetailsEdit() {
-    localStorage.getItem("user")
+  const token = JSON.parse(localStorage.getItem("user"))?.token;
 
-    const [userData, setUserData] = useState({
-        fullName: '',
-        email: '',
-        tpNum: '',
-        address: '',
-        category: '',
-        bio: ''
-    });
+  const [userData, setUserData] = useState({
+    fullName: '',
+    email: '',
+    tpNum: '',
+    address: '',
+    category: '',
+    bio: ''
+  });
 
-    const navigate = useNavigate();
+  const navigate = useNavigate();
 
-    const storedUser = localStorage.getItem("user");
-    const userId = storedUser ? JSON.parse(storedUser)?.id : null;
+  const storedUser = localStorage.getItem("user");
+  const userId = storedUser ? JSON.parse(storedUser)?.id : null;
 
-    console.log("User Id : ", userId);
+  console.log("User Id:", userId);
 
+  useEffect(() => {
+    if (!userId || !token) {
+      console.warn("Missing user ID or token.");
+      return;
+    }
 
+    axios.get(`http://localhost:8086/api/user/${userId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then(response => {
+        setUserData(response.data);
+      })
+      .catch(error => {
+        console.error("Failed to fetch user:", error);
+      });
+  }, [userId, token]);
 
-    useEffect(() => {
-        if (!userId) {
-            console.warn("No user ID found in localStorage.");
-            return;
-        }
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setUserData(prev => ({ ...prev, [name]: value }));
+  };
 
-        axios.get(`http://localhost:8086/api/user/${userId}`)
-            .then(response => {
-                setUserData(response.data);
-            })
-            .catch(error => {
-                console.error("Failed to fetch user:", error);
-            });
-    }, [userId]);
+  const handleSave = () => {
+    if (!token) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Unauthorized',
+        text: 'No token found. Please log in again.',
+      });
+      return;
+    }
 
-
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setUserData(prev => ({ ...prev, [name]: value }));
-    };
-
- const handleSave = () => {
-    axios.put(`http://localhost:8086/api/user/${userId}`, userData)
-        .then(() => {
-            Swal.fire({
-                icon: 'success',
-                title: 'Success!',
-                text: 'User details updated successfully!',
-                timer: 2000,
-                showConfirmButton: false
-            }).then(() => {
-                navigate('/user/user-profile');
-            });
-        })
-        .catch(error => {
-            console.error("Failed to update user:", error);
-            Swal.fire({
-                icon: 'error',
-                title: 'Update Failed',
-                text: 'Something went wrong while updating the user.',
-            });
+    axios.put(`http://localhost:8086/api/user/${userId}`, userData, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then(() => {
+        Swal.fire({
+          icon: 'success',
+          title: 'Success!',
+          text: 'User details updated successfully!',
+          timer: 2000,
+          showConfirmButton: false
+        }).then(() => {
+          navigate('/user/user-profile');
         });
-};
+      })
+      .catch(error => {
+        console.error("Failed to update user:", error);
+        Swal.fire({
+          icon: 'error',
+          title: 'Update Failed',
+          text: 'Something went wrong while updating the user.',
+        });
+      });
+  };
     return (
         <div>
             {/* Full Name */}

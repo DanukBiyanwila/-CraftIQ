@@ -8,6 +8,7 @@ import Elements from '../views/Elements';
 import FeeadbackManagment from '../views/FeeadbackManagment';
 import FindUser from '../views/FindUser';
 import Follower from '../views/Follower';
+import Following from '../views/Following';
 import Home from '../views/Home';
 import LearningPlane from '../views/LearningPlane';
 import LearningPlaneCreate from '../views/LearningPlaneCreate';
@@ -151,6 +152,13 @@ const UserRoutes = [
     path: "/progress-view",
     name: "progress view  ",
     component: ProgressView, 
+    layout: "/user",
+    hidden: false,
+  },
+   {
+    path: "/following",
+    name: "following  ",
+    component: Following, 
     layout: "/user",
     hidden: false,
   },

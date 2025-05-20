@@ -7,40 +7,45 @@ import SlideBar from "../components/SlideBar";
 function Home() {
   const [allSkillPosts, setAllSkillPosts] = useState([]);
 
-  useEffect(() => {
-    axios
-      .get("http://localhost:8086/api/skillposts/")
-      .then((response) => {
-        const formatted = response.data.map((post) => ({
-          id: post.id,
-          img: post.imageBase64
-            ? `data:image/jpeg;base64,${post.imageBase64}`
-            : "", // fallback
-          title: post.title,
-          summary: post.summary,
-          pargrhap1: post.pargrhap1,
-          pargrhap2: post.pargrhap2,
-          pargrhap3: post.pargrhap3,
-          pargrhap4: post.pargrhap4,
-          pargrhap5: post.pargrhap5,
-          category: post.category || "General",
-          commentCount: post.commentCount || 0,
-          date: [
-            {
-              day: new Date(post.createdAt).getDate(),
-              month: new Date(post.createdAt).toLocaleString("default", {
-                month: "short",
-              }),
-            },
-          ],
-          user: post.user,
-        }));
-        setAllSkillPosts(formatted);
-      })
-      .catch((error) => {
-        console.error("Error fetching all skill posts:", error);
-      });
-  }, []);
+ useEffect(() => {
+ const token = JSON.parse(localStorage.getItem("user"))?.token;
+  axios
+    .get("http://localhost:8086/api/skillposts/", {
+      headers: {
+        Authorization: `Bearer ${token}`, // Add the token here
+      },
+    })
+    .then((response) => {
+      const formatted = response.data.map((post) => ({
+        id: post.id,
+        img: post.imageBase64
+          ? `data:image/jpeg;base64,${post.imageBase64}`
+          : "",
+        title: post.title,
+        summary: post.summary,
+        pargrhap1: post.pargrhap1,
+        pargrhap2: post.pargrhap2,
+        pargrhap3: post.pargrhap3,
+        pargrhap4: post.pargrhap4,
+        pargrhap5: post.pargrhap5,
+        username: post.user?.username || "General",
+        commentCount: Array.isArray(post.feedbacks) ? post.feedbacks.length : 0,
+        date: [
+          {
+            day: new Date(post.createdAt).getDate(),
+            month: new Date(post.createdAt).toLocaleString("default", {
+              month: "short",
+            }),
+          },
+        ],
+        user: post.user,
+      }));
+      setAllSkillPosts(formatted);
+    })
+    .catch((error) => {
+      console.error("Error fetching all skill posts:", error);
+    });
+}, []);
 
   return (
     <div>
@@ -48,7 +53,7 @@ function Home() {
         <div className="container">
           <div className="row">
             <div className="col-lg-8 mb-5 mb-lg-0">
-              {allSkillPosts.slice(0, 8).map((skillpost) => (
+              {allSkillPosts.map((skillpost) => (
                 <AllPost key={skillpost.id} skillpost={skillpost} />
               ))}
             </div>
