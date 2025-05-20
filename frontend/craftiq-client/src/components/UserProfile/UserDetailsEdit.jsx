@@ -55,6 +55,28 @@ function UserDetailsEdit() {
       return;
     }
 
+      // Validate full name: only letters and spaces allowed
+  const nameRegex = /^[A-Za-z\s]+$/;
+  if (!nameRegex.test(userData.fullName)) {
+    Swal.fire({
+      icon: 'error',
+      title: 'Invalid Full Name',
+      text: 'Full name should only contain letters and spaces.',
+    });
+    return;
+  }
+
+  // Validate phone number: must be exactly 10 digits
+  const phoneRegex = /^\d{10}$/;
+  if (!phoneRegex.test(userData.tpNum)) {
+    Swal.fire({
+      icon: 'error',
+      title: 'Invalid Phone Number',
+      text: 'Phone number must be exactly 10 digits.',
+    });
+    return;
+  }
+
     axios.put(`http://localhost:8086/api/user/${userId}`, userData, {
       headers: {
         Authorization: `Bearer ${token}`,
