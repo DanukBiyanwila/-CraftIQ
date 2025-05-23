@@ -66,5 +66,5 @@ CraftIq is designed to promote a community of learners and creators. Users can r
 ### 🔧 1. Clone the Repository
 
 ```bash
-git clone https://github.com/your-username/CraftIq.git
+git clone https://github.com/your-username/CraftIq.git](https://github.com/DanukBiyanwila/-CraftIQ.git
 cd CraftIq
